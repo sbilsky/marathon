@@ -66,8 +66,6 @@ class Marathon(val configuration: Configuration) {
         val analytics = analyticsFactory.create()
 
         val parsedTests = testParser.extract(configuration.testApplicationOutput)
-        println("${parsedTests.size} test methods before filters")
-
         val tests = applyTestFilters(parsedTests)
 
         println("${tests.size} test methods after filters")
@@ -103,19 +101,8 @@ class Marathon(val configuration: Configuration) {
     }
 
     private fun applyTestFilters(parsedTests: List<Test>): List<Test> {
-        parsedTests.forEach {
-            log.warn { it.method }
-
-        }
         var tests = parsedTests.filter { test ->
-            configuration.testClassRegexes.all {
-                it.matches(test.clazz)
-            }
-        }
-
-
-        configuration.filteringConfiguration.blacklist.forEach {
-            log.warn { "$it" }
+            configuration.testClassRegexes.all { it.matches(test.clazz) }
         }
         configuration.filteringConfiguration.whitelist.forEach { tests = it.filter(tests) }
         configuration.filteringConfiguration.blacklist.forEach { tests = it.filterNot(tests) }
