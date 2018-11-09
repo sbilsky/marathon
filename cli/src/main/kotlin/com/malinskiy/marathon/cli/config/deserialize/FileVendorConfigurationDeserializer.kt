@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.treeToValue
-import com.malinskiy.marathon.android.AndroidConfiguration
 import com.malinskiy.marathon.cli.args.FileAndroidConfiguration
 import com.malinskiy.marathon.cli.args.FileIOSConfiguration
 import com.malinskiy.marathon.cli.args.FileVendorConfiguration
 import com.malinskiy.marathon.cli.config.ConfigurationException
-import com.malinskiy.marathon.ios.IOSConfiguration
-import com.malinskiy.marathon.vendor.VendorConfiguration
+
+const val TYPE_IOS = "iOS"
+const val TYPE_ANDROID = "Android"
 
 class FileVendorConfigurationDeserializer : StdDeserializer<FileVendorConfiguration>(FileVendorConfiguration::class.java) {
     override fun deserialize(p: JsonParser?, ctxt: DeserializationContext?): FileVendorConfiguration {
@@ -22,15 +22,16 @@ class FileVendorConfigurationDeserializer : StdDeserializer<FileVendorConfigurat
         val type = node.get("type").asText()
 
         return when (type) {
-            "iOS" -> {
+            TYPE_IOS -> {
                 (node as ObjectNode).remove("type")
                 codec.treeToValue<FileIOSConfiguration>(node)
             }
-            "Android" -> {
+            TYPE_ANDROID -> {
                 (node as ObjectNode).remove("type")
                 codec.treeToValue<FileAndroidConfiguration>(node)
             }
-            else -> throw ConfigurationException("Unrecognized sorting strategy $type")
+            else -> throw ConfigurationException("Unrecognized sorting strategy $type. " +
+                    "Valid options are $TYPE_ANDROID, $TYPE_IOS")
         }
     }
 }
