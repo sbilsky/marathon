@@ -1,18 +1,21 @@
 package com.malinskiy.marathon.actor
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.selects.SelectClause2
 
-abstract class Actor<in T>(parent: Job? = null) : SendChannel<T> {
+abstract class Actor<in T>(scope: CoroutineScope, parent: Job) : SendChannel<T> {
 
     protected abstract suspend fun receive(msg: T)
 
-    private val delegate = actor<T>(
+    private val delegate = scope.actor<T>(
             capacity = Channel.UNLIMITED,
-            parent = parent
+            context = parent
     ) {
         for (msg in channel) {
             receive(msg)
@@ -27,6 +30,7 @@ abstract class Actor<in T>(parent: Job? = null) : SendChannel<T> {
     override val onSend: SelectClause2<T, SendChannel<T>>
         get() = delegate.onSend
 
+    @ExperimentalCoroutinesApi
     override fun invokeOnClose(handler: (cause: Throwable?) -> Unit) {
         delegate.invokeOnClose(handler)
     }

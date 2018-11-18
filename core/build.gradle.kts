@@ -41,6 +41,7 @@ dependencies {
     implementation(Libraries.slf4jAPI)
     implementation(Libraries.logbackClassic)
     implementation(Libraries.influxDbClient)
+    testCompile(TestLibraries.mockito)
     testCompile(TestLibraries.kluent)
     testCompile(TestLibraries.spekAPI)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)

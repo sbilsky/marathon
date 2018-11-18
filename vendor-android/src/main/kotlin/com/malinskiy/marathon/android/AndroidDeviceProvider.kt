@@ -12,6 +12,7 @@ import com.malinskiy.marathon.device.DeviceProvider.DeviceEvent.DeviceDisconnect
 import com.malinskiy.marathon.exceptions.NoDevicesException
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.vendor.VendorConfiguration
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.nio.file.Paths
@@ -76,13 +77,15 @@ class AndroidDeviceProvider : DeviceProvider {
             }
 
             private fun notifyConnected(device: AndroidDevice) {
-                launch {
+                GlobalScope.launch {
+                    //TODO: replace globalscope
                     channel.send(DeviceConnected(device))
                 }
             }
 
             private fun notifyDisconnected(device: AndroidDevice) {
-                launch {
+                GlobalScope.launch {
+                    //TODO: replace globalscope
                     channel.send(DeviceDisconnected(device))
                 }
             }

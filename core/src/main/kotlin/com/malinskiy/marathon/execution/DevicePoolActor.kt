@@ -12,6 +12,7 @@ import com.malinskiy.marathon.execution.queue.QueueMessage
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.TestBatch
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.SendChannel
 
@@ -20,7 +21,8 @@ class DevicePoolActor(private val poolId: DevicePoolId,
                       analytics: Analytics,
                       tests: Collection<Test>,
                       private val progressReporter: ProgressReporter,
-                      parent: Job) : Actor<DevicePoolMessage>(parent = parent) {
+                      private val scope: CoroutineScope,
+                      job: Job) : Actor<DevicePoolMessage>(scope, job) {
 
     private val logger = MarathonLogging.logger("DevicePoolActor[${poolId.name}]")
 
@@ -38,13 +40,13 @@ class DevicePoolActor(private val poolId: DevicePoolId,
         }
     }
 
-    private val poolJob = Job(parent)
+    private val poolJob = Job(job)
 
     private val shardingStrategy = configuration.shardingStrategy
     private val flakinessShard = configuration.flakinessStrategy
     private val shard = flakinessShard.process(shardingStrategy.createShard(tests), analytics)
 
-    private val queue: QueueActor = QueueActor(configuration, shard, analytics, this, poolId, progressReporter, poolJob)
+    private val queue: QueueActor = QueueActor(configuration, shard, analytics, this, poolId, progressReporter, scope, poolJob)
 
     private val devices = mutableMapOf<String, SendChannel<DeviceEvent>>()
 
@@ -111,7 +113,7 @@ class DevicePoolActor(private val poolId: DevicePoolId,
         }
 
         logger.debug { "add device ${device.serialNumber}" }
-        val actor = DeviceActor(poolId, this, configuration, device, progressReporter, poolJob)
+        val actor = DeviceActor(poolId, this, configuration, device, progressReporter, scope, poolJob)
         devices[device.serialNumber] = actor
         actor.send(DeviceEvent.Initialize)
     }

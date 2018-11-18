@@ -25,6 +25,7 @@ dependencies {
     implementation(Libraries.jacksonYaml)
     implementation(project(":core"))
     testImplementation(TestLibraries.kluent)
+    testImplementation(TestLibraries.mockito)
     testImplementation(TestLibraries.spekAPI)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)
     testImplementation(TestLibraries.testContainers)

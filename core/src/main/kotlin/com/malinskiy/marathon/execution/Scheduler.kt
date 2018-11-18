@@ -10,13 +10,8 @@ import com.malinskiy.marathon.execution.DevicePoolMessage.FromScheduler.RemoveDe
 import com.malinskiy.marathon.execution.progress.ProgressReporter
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.joinChildren
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 
@@ -37,34 +32,40 @@ class Scheduler(private val deviceProvider: DeviceProvider,
 
     private val logger = MarathonLogging.logger("Scheduler")
 
+    private val job = SupervisorJob()
+
     suspend fun execute() {
-        val job = Job()
-        subscribeOnDevices(job)
+        supervisorScope {
+            subscribeOnDevices(job)
+        }
         try {
-            withTimeout(10, TimeUnit.SECONDS) {
+            withTimeout(TimeUnit.SECONDS.toMillis(10)) {
                 while (pools.isEmpty()) {
                     delay(100)
                 }
             }
         } catch (e: TimeoutCancellationException) {
             throw NoDevicesException("")
+        } finally {
+            job.join()
         }
-        job.joinChildren()
     }
 
     fun getPools(): List<DevicePoolId> {
         return pools.keys.toList()
     }
 
-    private fun subscribeOnDevices(job: Job) {
-        launch {
-            for (msg in deviceProvider.subscribe()) {
-                when (msg) {
-                    is DeviceProvider.DeviceEvent.DeviceConnected -> {
-                        onDeviceConnected(msg, job)
-                    }
-                    is DeviceProvider.DeviceEvent.DeviceDisconnected -> {
-                        onDeviceDisconnected(msg)
+    private suspend fun subscribeOnDevices(job: Job) {
+        coroutineScope {
+            launch(job) {
+                for (msg in deviceProvider.subscribe()) {
+                    when (msg) {
+                        is DeviceProvider.DeviceEvent.DeviceConnected -> {
+                            onDeviceConnected(msg, this, job)
+                        }
+                        is DeviceProvider.DeviceEvent.DeviceDisconnected -> {
+                            onDeviceDisconnected(msg)
+                        }
                     }
                 }
             }
@@ -78,16 +79,18 @@ class Scheduler(private val deviceProvider: DeviceProvider,
         }
     }
 
-    private suspend fun onDeviceConnected(item: DeviceProvider.DeviceEvent.DeviceConnected, parent: Job) {
+    private suspend fun onDeviceConnected(item: DeviceProvider.DeviceEvent.DeviceConnected, scope: CoroutineScope, job: Job) {
         val device = item.device
         val poolId = poolingStrategy.associate(device)
         logger.debug { "device ${device.serialNumber} associated with poolId ${poolId.name}" }
         pools.computeIfAbsent(poolId) { id ->
             logger.debug { "pool actor ${id.name} is being created" }
-            DevicePoolActor(id, configuration, analytics, tests, progressReporter, parent)
+            DevicePoolActor(id, configuration, analytics, tests, progressReporter, scope, job)
         }
-        pools[poolId]?.send(AddDevice(device)) ?: logger.debug { "not sending the AddDevice event " +
-                "to device pool for ${device.serialNumber}" }
+        pools[poolId]?.send(AddDevice(device)) ?: logger.debug {
+            "not sending the AddDevice event " +
+                    "to device pool for ${device.serialNumber}"
+        }
         analytics.trackDeviceConnected(poolId, device)
     }
 }

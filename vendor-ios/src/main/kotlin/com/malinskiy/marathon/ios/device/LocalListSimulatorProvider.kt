@@ -9,6 +9,7 @@ import com.malinskiy.marathon.ios.IOSConfiguration
 import com.malinskiy.marathon.ios.IOSDevice
 import com.malinskiy.marathon.ios.cmd.remote.SshjCommandExecutor
 import com.malinskiy.marathon.log.MarathonLogging
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.io.File
@@ -39,7 +40,7 @@ class LocalListSimulatorProvider(private val channel: Channel<DeviceProvider.Dev
     }
 
     override fun stop() {
-        launch {
+        GlobalScope.launch {
             devices.forEach {
                 logger.debug { "Disconnected simulator: ${it.serialNumber}" }
 
@@ -51,7 +52,7 @@ class LocalListSimulatorProvider(private val channel: Channel<DeviceProvider.Dev
     }
 
     override fun start() {
-        launch {
+        GlobalScope.launch {
             devices.forEach {
                 logger.debug { "Found new simulator: ${it.serialNumber}" }
 

@@ -31,7 +31,6 @@ dependencies {
     implementation(Libraries.kotlinStdLib)
     implementation(Libraries.kotlinCoroutines)
     implementation(Libraries.kotlinLogging)
-    implementation(Libraries.slf4jAPI)
     implementation(Libraries.logbackClassic)
     implementation(Libraries.argParser)
     implementation(Libraries.jacksonDatabind)
@@ -40,6 +39,7 @@ dependencies {
     implementation(Libraries.jacksonYaml)
     implementation(Libraries.jacksonJSR310)
     testCompile(TestLibraries.kluent)
+    testCompile(TestLibraries.mockito)
     testCompile(TestLibraries.spekAPI)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)
 }

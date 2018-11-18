@@ -21,6 +21,7 @@ dependencies {
     implementation(Libraries.jacksonAnnotations)
     implementation(project(":core"))
     testImplementation(TestLibraries.kluent)
+    testImplementation(TestLibraries.mockito)
     testImplementation(TestLibraries.spekAPI)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)
 }

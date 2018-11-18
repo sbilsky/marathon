@@ -17,6 +17,7 @@ dependencies {
     implementation(Libraries.kotlinCoroutines)
     implementation(Libraries.kotlinLogging)
     testCompile(TestLibraries.kluent)
+    testCompile(TestLibraries.mockito)
     testCompile(TestLibraries.spekAPI)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)
 }

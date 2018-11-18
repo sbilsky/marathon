@@ -15,6 +15,7 @@ import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.TestBatch
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.SendChannel
 import java.util.*
@@ -25,7 +26,8 @@ class QueueActor(configuration: Configuration,
                  private val pool: SendChannel<FromQueue>,
                  private val poolId: DevicePoolId,
                  private val progressReporter: ProgressReporter,
-                 poolJob: Job) : Actor<QueueMessage>(parent = poolJob) {
+                 private val scope : CoroutineScope,
+                 poolJob: Job) : Actor<QueueMessage>(scope, poolJob) {
 
     private val logger = MarathonLogging.logger("QueueActor[$poolId]")
 

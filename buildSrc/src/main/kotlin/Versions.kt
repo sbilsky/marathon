@@ -6,8 +6,8 @@ object Versions {
 
     val ddmlib = "26.2.0"
     val dexTestParser = "2.0.0"
-    val kotlinLogging = "1.4.9"
-    val slf4jAPI = "1.0.0"
+    val kotlinLogging = "1.6.10"
+    val slf4jAPI = "1.7.25"
     val logbackClassic = "1.2.3"
     val axmlParser = "1.0"
 
@@ -15,7 +15,8 @@ object Versions {
     val androidGradleVersion = "3.2.1"
 
     val spek = "1.1.5"
-    val kluent = "1.40"
+    val kluent = "1.42"
+    val mockito = "2.0.0"
 
     val kakao = "1.4.0"
     val espresso = "3.0.1"
@@ -52,7 +53,7 @@ object Libraries {
     val kotlinStdLibCommon = "org.jetbrains.kotlin:kotlin-stdlib-common:${Versions.kotlin}"
     val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     val kotlinLogging = "io.github.microutils:kotlin-logging:${Versions.kotlinLogging}"
-    val slf4jAPI = "ch.frankel.log4k:slf4k-api:${Versions.slf4jAPI}"
+    val slf4jAPI = "org.slf4j:slf4j-api:${Versions.slf4jAPI}"
     val logbackClassic = "ch.qos.logback:logback-classic:${Versions.logbackClassic}"
     val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
     val axmlParser = "com.shazam:axmlparser:${Versions.axmlParser}"
@@ -75,6 +76,7 @@ object Libraries {
 object TestLibraries {
     val spekAPI = "org.jetbrains.spek:spek-api:${Versions.spek}"
     val spekJUnitPlatformEngine = "org.jetbrains.spek:spek-junit-platform-engine:${Versions.spek}"
+    val mockito = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockito}"
     val kluent = "org.amshove.kluent:kluent:${Versions.kluent}"
     val kakao = "com.agoda.kakao:kakao:${Versions.kakao}"
 
