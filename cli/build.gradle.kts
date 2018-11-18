@@ -24,8 +24,6 @@ distributions {
     }
 }
 
-kotlin.experimental.coroutines = Coroutines.ENABLE
-
 dependencies {
     implementation(project(":core"))
     implementation(project(":vendor-ios"))

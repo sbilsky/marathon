@@ -1,10 +1,10 @@
 package com.malinskiy.marathon.actor
 
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.channels.SendChannel
-import kotlinx.coroutines.experimental.channels.actor
-import kotlinx.coroutines.experimental.selects.SelectClause2
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.selects.SelectClause2
 
 abstract class Actor<in T>(parent: Job? = null) : SendChannel<T> {
 
@@ -18,6 +18,7 @@ abstract class Actor<in T>(parent: Job? = null) : SendChannel<T> {
             receive(msg)
         }
     }
+
 
     override val isClosedForSend: Boolean
         get() = delegate.isClosedForSend

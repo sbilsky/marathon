@@ -12,8 +12,8 @@ import com.malinskiy.marathon.execution.queue.QueueMessage
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.TestBatch
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.channels.SendChannel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.SendChannel
 
 class DevicePoolActor(private val poolId: DevicePoolId,
                       private val configuration: Configuration,

@@ -13,8 +13,6 @@ plugins {
     id("org.junit.platform.gradle.plugin")
 }
 
-kotlin.experimental.coroutines = Coroutines.ENABLE
-
 sourceSets {
     create("integrationTest") {
         compileClasspath += sourceSets["main"].output

@@ -11,8 +11,6 @@ plugins {
     id("org.junit.platform.gradle.plugin")
 }
 
-kotlin.experimental.coroutines = Coroutines.ENABLE
-
 dependencies {
     implementation(Libraries.gson)
     implementation(Libraries.kotlinStdLib)
