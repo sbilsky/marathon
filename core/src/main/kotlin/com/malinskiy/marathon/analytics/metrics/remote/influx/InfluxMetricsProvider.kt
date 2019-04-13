@@ -6,7 +6,6 @@ import com.malinskiy.marathon.execution.AnalyticsConfiguration
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.toSafeTestName
-import com.sun.org.apache.xpath.internal.operations.Bool
 import org.influxdb.InfluxDB
 import org.influxdb.annotation.Column
 import org.influxdb.annotation.Measurement
