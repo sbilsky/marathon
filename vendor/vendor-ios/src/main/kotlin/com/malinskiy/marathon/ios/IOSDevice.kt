@@ -389,4 +389,3 @@ private fun String.toInetAddressOrNull(): InetAddress? {
             }) { address } else { null }
 }
 
-private fun TestBatch.toXcodebuildArguments(): String = tests.joinToString(separator = " ") { "-only-testing:\"${it.pkg}/${it.clazz}/${it.method}\"" }
