@@ -21,9 +21,9 @@ data class IOSConfiguration(val derivedDataDir: File,
                             val deviceInitializationTimeoutMillis: Long = DEFAULT_DEVICE_INITIALIZATION_TIMEOUT_MILLIS,
                             val devicesFile: File? = null,
                             val sourceRoot: File = File("."),
-                            val sourceRootsRegex: Regex?,
+                            val sourceRootsRegex: Regex? = null,
                             val sourceTargetName: String?,
-                            val binaryParserDockerImageName: String?) : VendorConfiguration {
+                            val binaryParserDockerImageName: String? = null) : VendorConfiguration {
 
     companion object {
         const val DEFAULT_DEVICE_INITIALIZATION_TIMEOUT_MILLIS: Long = 300_000

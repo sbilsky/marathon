@@ -29,7 +29,7 @@ class Mocks {
             private val gson = GsonBuilder().registerTypeAdapter(SimctlDeviceList::class.java, SimctlDeviceListDeserializer()).create()
 
             val DEFAULT = com.malinskiy.marathon.ios.IOSDevice(
-                RemoteSimulator("localhost", "63D0962A-0A41-4BE9-A99E-E6220412BEB1", null),
+                RemoteSimulator("localhost", "63D0962A-0A41-4BE9-A99E-E6220412BEB1", null, null),
                 1,
                 mock(IOSConfiguration::class),
                 gson,
