@@ -91,7 +91,7 @@ class TestRunProgressParser(private val timer: Timer,
         logger.debug { "Test $pkg.$clazz.$method finished with result <$result> after $duration seconds" }
 
         if (pkg != null && clazz != null && method != null && result != null && duration != null) {
-            val test = Test(pkg, clazz, method, emptyList())
+            val test = Test(pkg, clazz, method, currentTest?.metaProperties ?: emptyList())
 
             currentTest?.let {
                 if (it != test) {
@@ -122,7 +122,7 @@ class TestRunProgressParser(private val timer: Timer,
         val method = matchResult?.groups?.get(3)?.value
 
         if (pkg != null && clazz != null && method != null) {
-            val test = Test(pkg, clazz, method, emptyList())
+            val test = Test(pkg, clazz, method, currentTest?.metaProperties ?: emptyList())
             logger.trace { "Test $pkg.$clazz.$method started" }
 
             currentTest?.let {
