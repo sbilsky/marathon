@@ -5,13 +5,16 @@ import com.malinskiy.marathon.ios.logparser.StreamingLogParser
 import com.malinskiy.marathon.ios.logparser.formatter.PackageNameFormatter
 import com.malinskiy.marathon.ios.logparser.listener.TestRunListener
 import com.malinskiy.marathon.log.MarathonLogging
+import com.malinskiy.marathon.test.MetaProperty
 import com.malinskiy.marathon.test.Test
+import com.malinskiy.marathon.test.TestBatch
 import com.malinskiy.marathon.time.Timer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class TestRunProgressParser(private val timer: Timer,
                             private val packageNameFormatter: PackageNameFormatter,
+                            private val testBatch: TestBatch,
                             private val listeners: Collection<TestRunListener>) : StreamingLogParser {
 
     override fun close() {
@@ -91,7 +94,7 @@ class TestRunProgressParser(private val timer: Timer,
         logger.debug { "Test $pkg.$clazz.$method finished with result <$result> after $duration seconds" }
 
         if (pkg != null && clazz != null && method != null && result != null && duration != null) {
-            val test = Test(pkg, clazz, method, currentTest?.metaProperties ?: emptyList())
+            val test = Test(pkg, clazz, method, getTestMetaProperties(pkg, clazz, method))
 
             currentTest?.let {
                 if (it != test) {
@@ -122,7 +125,7 @@ class TestRunProgressParser(private val timer: Timer,
         val method = matchResult?.groups?.get(3)?.value
 
         if (pkg != null && clazz != null && method != null) {
-            val test = Test(pkg, clazz, method, currentTest?.metaProperties ?: emptyList())
+            val test = Test(pkg, clazz, method, getTestMetaProperties(pkg, clazz, method))
             logger.trace { "Test $pkg.$clazz.$method started" }
 
             currentTest?.let {
@@ -133,6 +136,18 @@ class TestRunProgressParser(private val timer: Timer,
 
             listeners.forEach { it.testStarted(test) }
         }
+    }
+
+    private fun getTestMetaProperties(pkg: String,
+                                      clazz: String,
+                                      method: String): Collection<MetaProperty> {
+        return testBatch.tests.find {
+            it.pkg == pkg &&
+                it.clazz == clazz &&
+                it.method == method
+        }?.let {
+            it.metaProperties
+        }?: emptyList()
     }
 
     private var currentTest: Test? = null
