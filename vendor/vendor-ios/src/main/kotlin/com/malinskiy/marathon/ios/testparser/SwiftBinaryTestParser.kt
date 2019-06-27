@@ -41,10 +41,14 @@ class SwiftBinaryTestParser(private val binaryParserDockerImageName: String): Do
             binaryParserDockerImageName +
             pathMappings.map { it.second }
 
+    logger.debug(command.joinToString(" "))
+
     val process = ProcessBuilder()
       .command(command)
       .directory(File(System.getProperty("user.dir")))
       .start()
+
+    logger.debug(process.toString())
 
     val output = mutableListOf<String>()
     val outputReader = DockerOutputReader(process.inputStream) { output.add(it) }
