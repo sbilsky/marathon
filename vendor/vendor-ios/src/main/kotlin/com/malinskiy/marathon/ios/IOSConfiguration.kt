@@ -23,7 +23,8 @@ data class IOSConfiguration(val derivedDataDir: File,
                             val sourceRoot: File = File("."),
                             val sourceRootsRegex: Regex? = null,
                             val sourceTargetName: String?,
-                            val binaryParserDockerImageName: String? = null) : VendorConfiguration {
+                            val binaryParserDockerImageName: String? = null,
+                            val disableHostKeyVerifier: Boolean = false) : VendorConfiguration {
 
     companion object {
         const val DEFAULT_DEVICE_INITIALIZATION_TIMEOUT_MILLIS: Long = 300_000
