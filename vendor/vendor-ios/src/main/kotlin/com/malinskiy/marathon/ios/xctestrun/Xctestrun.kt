@@ -96,11 +96,8 @@ class Xctestrun(inputStream: InputStream) {
         return skipped.contains(test.clazz) || skipped.contains("${test.clazz}/${test.method}")
     }
 
-    private fun targetNameFromProductModuleName(productModuleName: String): String? {
-        return targetNames.firstOrNull {
-            //TODO: Double check
-            it == productModuleName
-        }
+    fun targetNameFromProductModuleName(productModuleName: String): String? {
+        return targetNames.firstOrNull { productModuleName(it) == productModuleName }
     }
 
     // property list manipulation

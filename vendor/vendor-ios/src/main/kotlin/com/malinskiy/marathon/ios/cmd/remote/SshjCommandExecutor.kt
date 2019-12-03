@@ -46,7 +46,7 @@ class SshjCommandExecutor(connectionId: String,
                           val knownHostsPath: File? = null,
                           keepAliveIntervalMillis: Long = 0L,
                           verbose: Boolean = false,
-                          disableHostKeyVerifier: Boolean) : CommandExecutor, CoroutineScope {
+                          disableHostKeyVerifier: Boolean = false) : CommandExecutor, CoroutineScope {
 
     private val dispatcher = newSingleThreadContext("$connectionId-ssh")
     override val coroutineContext: CoroutineContext
