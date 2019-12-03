@@ -6,7 +6,6 @@ import com.malinskiy.marathon.ios.testparser.SwiftBinaryTestParser
 import com.malinskiy.marathon.ios.xctestrun.TestBundleInfo
 import com.malinskiy.marathon.ios.xctestrun.Xctestrun
 import com.malinskiy.marathon.log.MarathonLogging
-import com.malinskiy.marathon.report.html.relativePathTo
 import com.malinskiy.marathon.test.Test
 import java.io.File
 
@@ -106,14 +105,6 @@ class IOSTestParser : TestParser {
             throw IllegalArgumentException("Expected a directory at ${vendorConfiguration.sourceRoot}")
         }
 
-        val sourceRoots = if (vendorConfiguration.sourceRootsRegex != null) {
-            vendorConfiguration.sourceRoot.walkTopDown().filter {
-                it.isDirectory &&
-                    vendorConfiguration.sourceRootsRegex
-                        .containsMatchIn(it.relativePathTo(vendorConfiguration.sourceRoot))
-            }.toList()
-        } else listOf(vendorConfiguration.sourceRoot)
-
         val xctestrun = Xctestrun(vendorConfiguration.xctestrunPath)
         val targetName = vendorConfiguration.sourceTargetName
                 ?: xctestrun.targetNames.firstOrNull()
@@ -124,34 +115,26 @@ class IOSTestParser : TestParser {
                 ?: throw IllegalStateException("Unable to find target name $targetName" +
                         "in the provided xctestrun file")
 
-        val swiftFilesWithTests = sourceRoots.map { sourceRoot ->
-            sourceRoot.listFiles("swift").filter(swiftTestClassRegex)
-        }
+        val swiftFilesWithTests = vendorConfiguration
+            .sourceRoot
+            .listFiles("swift")
+            .filter(swiftTestClassRegex)
 
         val implementedTests = mutableListOf<Test>()
-        for (fileSet in swiftFilesWithTests) {
-            for (file in fileSet) {
-                var testClassName: String? = null
-                for (line in file.readLines()) {
-                    val className = line.firstMatchOrNull(swiftTestClassRegex)
-                    val methodName = line.firstMatchOrNull(swiftTestMethodRegex)
+        for (file in swiftFilesWithTests) {
+            var testClassName: String? = null
+            for (line in file.readLines()) {
+                val className = line.firstMatchOrNull(swiftTestClassRegex)
+                val methodName = line.firstMatchOrNull(swiftTestMethodRegex)
 
-                    if (className != null) {
-                        testClassName = className
-                    }
+                if (className != null) { testClassName = className }
 
-                    if (testClassName != null && methodName != null) {
-                        implementedTests.add(
-                                Test(moduleName,
-                                        testClassName,
-                                        methodName,
-                                        listOf(testTargetMetaProperty(targetName))))
-                    }
-                }
+                if (testClassName != null && methodName != null)
+                    implementedTests.add(Test(moduleName, testClassName, methodName, listOf(testTargetMetaProperty(targetName))))
             }
         }
 
-        logger.info { "Discovered ${implementedTests.size} tests in ${swiftFilesWithTests.size} source files."}
+        logger.info { "Discovered ${implementedTests.size} tests in ${swiftFilesWithTests.count()} source files."}
 
         val filteredTests = implementedTests.filter { !xctestrun.isSkipped(it) }
 

@@ -80,9 +80,9 @@ class Marathon(val configuration: Configuration) {
         return loader.first()
     }
 
-    fun run(printTestCountAndExit: Boolean = false, outputPrinter: OutputPrinter? = null) = runBlocking {
+    fun run() = runBlocking {
         try {
-            runAsync(printTestCountAndExit = printTestCountAndExit, outputPrinter = outputPrinter)
+            runAsync()
         } catch (th: Throwable) {
             log.error(th.toString())
             log.debug(th.stackTrace.joinToString { "$it" })
@@ -90,21 +90,13 @@ class Marathon(val configuration: Configuration) {
         }
     }
 
-    suspend fun runAsync(printTestCountAndExit: Boolean = false, outputPrinter: OutputPrinter? = null): Boolean {
+    suspend fun runAsync(): Boolean {
         configureLogging(configuration.vendorConfiguration)
         trackAnalytics(configuration)
 
         val testParser = loadTestParser(configuration.vendorConfiguration)
         val parsedTests = testParser.extract(configuration)
         val tests = applyTestFilters(parsedTests)
-
-        if (printTestCountAndExit) {
-            if (outputPrinter == null) {
-                throw IllegalArgumentException("Unable to print to null")
-            }
-            outputPrinter.print(testCount = tests.size)
-            return true
-        }
 
         log.info("Scheduling ${tests.size} tests")
         log.debug(tests.joinToString(", ") { it.toTestName() })
