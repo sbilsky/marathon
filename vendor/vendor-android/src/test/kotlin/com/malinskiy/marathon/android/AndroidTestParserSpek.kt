@@ -30,6 +30,8 @@ class AndroidTestParserSpek : Spek({
                     isCodeCoverageEnabled = null,
                     fallbackToScreenshots = null,
                     testSuiteNameMatchesClassName = null,
+                    strictMode = null,
+                    uncompletedTestRetryQuota = null,
                     testClassRegexes = null,
                     includeSerialRegexes = null,
                     excludeSerialRegexes = null,

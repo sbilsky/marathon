@@ -12,6 +12,7 @@ import com.malinskiy.marathon.cli.config.deserialize.FlakinessStrategyDeserializ
 import com.malinskiy.marathon.cli.config.deserialize.InfluxDbConfigurationDeserializer
 import com.malinskiy.marathon.cli.config.deserialize.PoolingStrategyDeserializer
 import com.malinskiy.marathon.cli.config.deserialize.ProbabilityBasedFlakinessStrategyDeserializer
+import com.malinskiy.marathon.cli.config.deserialize.RetentionPolicyConfigurationDeserializer
 import com.malinskiy.marathon.cli.config.deserialize.RetryStrategyDeserializer
 import com.malinskiy.marathon.cli.config.deserialize.ShardingStrategyDeserializer
 import com.malinskiy.marathon.cli.config.deserialize.SortingStrategyDeserializer
@@ -30,10 +31,11 @@ import com.malinskiy.marathon.execution.strategy.impl.flakiness.ProbabilityBased
 import com.malinskiy.marathon.execution.strategy.impl.retry.fixedquota.FixedQuotaRetryStrategy
 import com.malinskiy.marathon.execution.strategy.impl.sorting.ExecutionTimeSortingStrategy
 
-class DeserializeModule(instantTimeProvider: InstantTimeProvider): SimpleModule() {
+class DeserializeModule(instantTimeProvider: InstantTimeProvider) : SimpleModule() {
     init {
         addDeserializer(AnalyticsConfiguration::class.java, AnalyticsConfigurationDeserializer())
         addDeserializer(AnalyticsConfiguration.InfluxDbConfiguration::class.java, InfluxDbConfigurationDeserializer())
+        addDeserializer(AnalyticsConfiguration.InfluxDbConfiguration.RetentionPolicyConfiguration::class.java, RetentionPolicyConfigurationDeserializer())
         addDeserializer(PoolingStrategy::class.java, PoolingStrategyDeserializer())
         addDeserializer(ShardingStrategy::class.java, ShardingStrategyDeserializer())
         addDeserializer(SortingStrategy::class.java, SortingStrategyDeserializer())

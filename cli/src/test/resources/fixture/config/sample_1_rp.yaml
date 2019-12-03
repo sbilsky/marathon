@@ -6,7 +6,12 @@ analyticsConfiguration:
     user: "root"
     password: "root"
     dbName: "marathon"
-    logLevel: "NONE"
+    retentionPolicyConfiguration:
+      name: "rpMarathonTest"
+      duration: "90d"
+      shardDuration: "1h"
+      replicationFactor: 5
+      isDefault: false
 poolingStrategy:
 - type: "omni"
 - type: "device-model"
@@ -31,10 +36,6 @@ retryStrategy:
   type: "fixed-quota"
   totalAllowedRetryQuota: 100
   retryPerTestQuota: 2
-  noRetryTestMatchers:
-    - package: "TestPackage"
-      class: "TestClass"
-      method: "TestMethod"
 filteringConfiguration:
   whitelist:
   - type: "simple-class-name"
@@ -64,7 +65,6 @@ excludeSerialRegexes:
 ignoreFailures: false
 isCodeCoverageEnabled: false
 fallbackToScreenshots: false
-testSuiteNameMatchesClassName: true
 strictMode: true
 testBatchTimeoutMillis: 20000
 testOutputTimeoutMillis: 30000

@@ -3,7 +3,9 @@ package com.malinskiy.marathon
 import com.google.gson.Gson
 import com.malinskiy.marathon.analytics.Analytics
 import com.malinskiy.marathon.analytics.AnalyticsFactory
+import com.malinskiy.marathon.config.LogicalConfigurationValidator
 import com.malinskiy.marathon.device.DeviceProvider
+import com.malinskiy.marathon.exceptions.NoDevicesException
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.execution.Scheduler
 import com.malinskiy.marathon.execution.TestParser
@@ -42,6 +44,7 @@ class Marathon(val configuration: Configuration) {
     private val deviceInfoReporter = DeviceInfoReporter(fileManager, gson)
     private val analyticsFactory = AnalyticsFactory(configuration, fileManager, deviceInfoReporter, testResultReporter,
             gson)
+    private val configurationValidator = LogicalConfigurationValidator()
 
     private fun configureLogging(vendorConfiguration: VendorConfiguration) {
         MarathonLogging.debug = configuration.debug
@@ -85,8 +88,14 @@ class Marathon(val configuration: Configuration) {
             runAsync()
         } catch (th: Throwable) {
             log.error(th.toString())
-            log.debug(th.stackTrace.joinToString { "$it" })
-            false
+
+            when(th) {
+                is NoDevicesException -> {
+                    log.warn { "No devices found" }
+                    false
+                }
+                else -> configuration.ignoreFailures
+            }
         }
     }
 
@@ -95,14 +104,17 @@ class Marathon(val configuration: Configuration) {
         trackAnalytics(configuration)
 
         val testParser = loadTestParser(configuration.vendorConfiguration)
+        val deviceProvider = loadDeviceProvider(configuration.vendorConfiguration)
+        val analytics = analyticsFactory.create()
+
+        configurationValidator.validate(configuration)
+
         val parsedTests = testParser.extract(configuration)
         val tests = applyTestFilters(parsedTests)
 
         log.info("Scheduling ${tests.size} tests")
         log.debug(tests.joinToString(", ") { it.toTestName() })
 
-        val deviceProvider = loadDeviceProvider(configuration.vendorConfiguration)
-        val analytics = analyticsFactory.create()
         val shard = prepareTestShard(tests, analytics)
 
         val progressReporter = ProgressReporter()

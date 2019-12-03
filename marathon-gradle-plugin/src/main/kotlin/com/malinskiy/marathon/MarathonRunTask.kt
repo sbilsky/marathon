@@ -60,6 +60,8 @@ open class MarathonRunTask : DefaultTask(), VerificationTask {
                 extensionConfig.isCodeCoverageEnabled,
                 extensionConfig.fallbackToScreenshots,
                 extensionConfig.testSuiteNameMatchesClassName,
+                extensionConfig.strictMode,
+                extensionConfig.uncompletedTestRetryQuota,
                 extensionConfig.testClassRegexes?.map { it.toRegex() },
                 extensionConfig.includeSerialRegexes?.map { it.toRegex() },
                 extensionConfig.excludeSerialRegexes?.map { it.toRegex() },
@@ -81,7 +83,7 @@ open class MarathonRunTask : DefaultTask(), VerificationTask {
 
         val success = Marathon(cnf).run()
 
-        if (!success && !cnf.ignoreFailures) {
+        if (!success) {
             throw GradleException("Tests failed! See ${cnf.outputDir}/html/index.html")
         }
     }
