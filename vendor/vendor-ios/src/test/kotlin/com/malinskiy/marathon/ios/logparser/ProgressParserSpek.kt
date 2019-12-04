@@ -1,9 +1,10 @@
 package com.malinskiy.marathon.ios.logparser
 
-import com.malinskiy.marathon.ios.logparser.formatter.PackageNameFormatter
+import com.malinskiy.marathon.ios.logparser.target.TestTargetProvider
 import com.malinskiy.marathon.ios.logparser.listener.TestRunListener
 import com.malinskiy.marathon.ios.logparser.parser.TestRunProgressParser
 import com.malinskiy.marathon.test.Test
+import com.malinskiy.marathon.test.TestBatch
 import com.malinskiy.marathon.time.Timer
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.reset
@@ -34,16 +35,17 @@ class ProgressParserSpek : Spek({
         val mockedEndTimeMillis = 1537187696999L
         var mockedTime = mockedStartTimeMillis
 
-        val mockFormatter = mock(PackageNameFormatter::class)
+        val mockTargetProvider = mock(TestTargetProvider::class)
+        val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
-        val progressParser = TestRunProgressParser(mockTimer, mockFormatter, listOf(mockListener))
+        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
 
         beforeEachTest {
             mockedTime = mockedStartTimeMillis
-            When calling mockFormatter.format(any()) itAnswers withFirstArg()
+            When calling mockTargetProvider.targetOf(any()) itAnswers withFirstArg()
             whenever(mockTimer.currentTimeMillis()).thenAnswer { mockedTime.also { mockedTime = mockedEndTimeMillis } }
         }
-        afterEachTest { reset(mockTimer, mockListener, mockFormatter) }
+        afterEachTest { reset(mockTimer, mockListener, mockTestBatch, mockTargetProvider) }
 
         on("parsing a crashing test batch output") {
             val testOutputFile = File(javaClass.classLoader.getResource("fixtures/test_output/crash_0.log").file)
@@ -77,26 +79,27 @@ class ProgressParserSpek : Spek({
     }
 
     describe("TestRunProgressParser") {
-        val mockFormatter = mock(PackageNameFormatter::class)
+        val mockTargetProvider = mock(TestTargetProvider::class)
+        val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
         val mockTimer = mock(Timer::class)
         val mockedTimeMillis = 1537187696000L
         When calling mockTimer.currentTimeMillis() itReturns mockedTimeMillis
 
-        val progressParser = TestRunProgressParser(mockTimer, mockFormatter, listOf(mockListener))
+        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
 
-        beforeEachTest { When calling mockFormatter.format(any()) itAnswers withFirstArg() }
-        afterEachTest { reset(mockListener, mockFormatter) }
+        beforeEachTest { When calling mockTargetProvider.targetOf(any()) itAnswers withFirstArg() }
+        afterEachTest { reset(mockListener, mockTestBatch, mockTargetProvider) }
 
         on("parsing testing output") {
             val testOutputFile = File(javaClass.classLoader.getResource("fixtures/test_output/success_0.log").file)
 
-            it("should apply package name formatter") {
+            it("should use assigned test target provider") {
                 testOutputFile.readLines().forEach {
                     progressParser.onLine(it)
                 }
 
-                verify(mockFormatter, atLeastOnce()) that mockFormatter.format("sample_appUITests") was called
+                verify(mockTargetProvider, atLeastOnce()) that mockTargetProvider.targetOf("sample_appUITests") was called
             }
         }
 

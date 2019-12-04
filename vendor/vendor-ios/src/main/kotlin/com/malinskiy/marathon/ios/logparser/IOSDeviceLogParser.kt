@@ -4,7 +4,7 @@ import com.malinskiy.marathon.device.Device
 import com.malinskiy.marathon.device.DevicePoolId
 import com.malinskiy.marathon.execution.TestBatchResults
 import com.malinskiy.marathon.execution.progress.ProgressReporter
-import com.malinskiy.marathon.ios.logparser.formatter.PackageNameFormatter
+import com.malinskiy.marathon.ios.logparser.target.TestTargetProvider
 import com.malinskiy.marathon.ios.logparser.listener.ProgressReportingListener
 import com.malinskiy.marathon.ios.logparser.listener.TestLogListener
 import com.malinskiy.marathon.ios.logparser.parser.CompositeLogParser
@@ -18,7 +18,7 @@ import com.malinskiy.marathon.time.SystemTimer
 import kotlinx.coroutines.CompletableDeferred
 
 class IOSDeviceLogParser(device: Device,
-                         packageNameFormatter: PackageNameFormatter,
+                         testTargetProvider: TestTargetProvider,
                          poolId: DevicePoolId,
                          testBatch: TestBatch,
                          deferredResults: CompletableDeferred<TestBatchResults>,
@@ -47,7 +47,7 @@ class IOSDeviceLogParser(device: Device,
                 sessionResultsPathFinder,
                 TestRunProgressParser(
                     timer,
-                    packageNameFormatter,
+                    testTargetProvider,
                     testBatch,
                     listOf(
                         ProgressReportingListener(
