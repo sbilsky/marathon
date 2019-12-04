@@ -2,7 +2,6 @@ package com.malinskiy.marathon.ios
 
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.execution.TestParser
-import com.malinskiy.marathon.ios.Test
 import com.malinskiy.marathon.ios.testparser.SwiftBinaryTestParser
 import com.malinskiy.marathon.ios.xctestrun.TestBundleInfo
 import com.malinskiy.marathon.ios.xctestrun.Xctestrun
@@ -55,15 +54,12 @@ class IOSTestParser : TestParser {
 
         val files = targetExecutables(vendorConfiguration.xctestrunPath)
 
+        val parser = SwiftBinaryTestParser(dockerImageName)
         val xctestrun = Xctestrun(vendorConfiguration.xctestrunPath)
 
-        val compiledTests = SwiftBinaryTestParser(dockerImageName)
-            .listTests(files)
-            .map {
-                val targetName = xctestrun.targetNameFromProductModuleName(it.pkg)
-                    ?: throw IllegalStateException("Module ${it.pkg} does not have a matching target in xctestrun")
-                Test(it.pkg, it.clazz, it.method, targetName)
-            }
+        val compiledTests = files.entries.map { (targetName, file) ->
+            parser.listTests(targetName, file)
+        }.flatten()
 
         logger.info { "Discovered ${compiledTests.size} tests in ${files.size} executable files."}
 
@@ -76,14 +72,16 @@ class IOSTestParser : TestParser {
         return filteredTests
     }
 
-    private fun targetExecutables(xctestrunPath: File): List<File> {
+    private fun targetExecutables(xctestrunPath: File): Map<String, File> {
         val xctestrun = Xctestrun(xctestrunPath)
-        return xctestrun.targetNames.map {
-            xctestrun.testHostBundlePath(it)?.let { testHostBundle ->
+        return xctestrun.targetNames.mapNotNull { targetName ->
+            xctestrun.testHostBundlePath(targetName)?.let { testHostBundle ->
                 val testHostBundlePath = xctestrunPath.resolveSibling(testHostBundle)
-                bundleExecutable(testHostBundlePath)
+                bundleExecutable(testHostBundlePath)?.let { executable ->
+                    targetName to executable
+                }
             }
-        }.filterNotNull()
+        }.toMap()
     }
 
     private fun bundleExecutable(bundle: File): File? {
