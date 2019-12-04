@@ -7,7 +7,7 @@ sealed class AnalyticsConfiguration {
                                      val password: String,
                                      val dbName: String,
                                      val retentionPolicyConfiguration: RetentionPolicyConfiguration,
-                                     val logLevel: LogLevel) : AnalyticsConfiguration() {
+                                     val logLevel: LogLevel = LogLevel.VERBOSE) : AnalyticsConfiguration() {
 
         enum class LogLevel { NONE, VERBOSE }
 
