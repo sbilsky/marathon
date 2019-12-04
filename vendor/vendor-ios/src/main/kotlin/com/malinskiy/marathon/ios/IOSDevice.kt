@@ -21,7 +21,7 @@ import com.malinskiy.marathon.ios.cmd.remote.execOrNull
 import com.malinskiy.marathon.ios.device.RemoteSimulator
 import com.malinskiy.marathon.ios.device.RemoteSimulatorFeatureProvider
 import com.malinskiy.marathon.ios.logparser.IOSDeviceLogParser
-import com.malinskiy.marathon.ios.logparser.target.TestLogTestTargetProvider
+import com.malinskiy.marathon.ios.logparser.target.XctestrunTestTargetResolver
 import com.malinskiy.marathon.ios.logparser.parser.DeviceFailureException
 import com.malinskiy.marathon.ios.logparser.parser.DeviceFailureReason
 import com.malinskiy.marathon.ios.simctl.Simctl
@@ -161,8 +161,7 @@ class IOSDevice(val simulator: RemoteSimulator,
         logger.debug("Remote xctestrun = $remoteXctestrunFile")
 
         val xctestrun = Xctestrun(iosConfiguration.xctestrunPath)
-        val poductModuleNameMap = xctestrun.targetNames.mapNotNull { target -> xctestrun.productModuleName(target)?.let { it to target } }.toMap()
-        val testTargetProvider = TestLogTestTargetProvider(poductModuleNameMap)
+        val testTargetProvider = XctestrunTestTargetResolver(xctestrun)
 
         logger.debug("Tests = ${testBatch.tests.toList()}")
 
