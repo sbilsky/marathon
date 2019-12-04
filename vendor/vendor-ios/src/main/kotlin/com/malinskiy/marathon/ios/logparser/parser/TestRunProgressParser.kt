@@ -4,17 +4,15 @@ import com.malinskiy.marathon.execution.strategy.impl.flakiness.ProbabilityBased
 import com.malinskiy.marathon.ios.logparser.StreamingLogParser
 import com.malinskiy.marathon.ios.logparser.target.TestTargetResolver
 import com.malinskiy.marathon.ios.logparser.listener.TestRunListener
+import com.malinskiy.marathon.ios.Test
 import com.malinskiy.marathon.log.MarathonLogging
-import com.malinskiy.marathon.test.MetaProperty
 import com.malinskiy.marathon.test.Test
-import com.malinskiy.marathon.test.TestBatch
 import com.malinskiy.marathon.time.Timer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
 class TestRunProgressParser(private val timer: Timer,
                             private val testTargetResolver: TestTargetResolver,
-                            private val testBatch: TestBatch,
                             private val listeners: Collection<TestRunListener>) : StreamingLogParser {
 
     override fun close() {
@@ -85,7 +83,7 @@ class TestRunProgressParser(private val timer: Timer,
 
     private fun notifyTestFinished(line: String) {
         val matchResult = TEST_CASE_FINISHED.find(line)
-        val pkg = testTargetResolver.targetNameOf(matchResult?.groups?.get(1)?.value)
+        val pkg = matchResult?.groups?.get(1)?.value
         val clazz = matchResult?.groups?.get(2)?.value
         val method = matchResult?.groups?.get(3)?.value
         val result = matchResult?.groups?.get(4)?.value
@@ -94,26 +92,31 @@ class TestRunProgressParser(private val timer: Timer,
         logger.debug { "Test $pkg.$clazz.$method finished with result <$result> after $duration seconds" }
 
         if (pkg != null && clazz != null && method != null && result != null && duration != null) {
-            val test = Test(pkg, clazz, method, getTestMetaProperties(pkg, clazz, method))
+            val targetName = testTargetResolver.targetNameOf(pkg)
+            if (targetName == null) {
+                logger.error("Unable to determine build target of test $pkg.$clazz.$method")
+            } else {
+                val test = Test(pkg, clazz, method, targetName)
 
-            currentTest?.let {
-                if (it != test) {
-                    logger.error("Current test $it started at $currentTestStartTime does not match finishing test $test. It will be discarded and reported as incomplete.")
+                currentTest?.let {
+                    if (it != test) {
+                        logger.error("Current test $it started at $currentTestStartTime does not match finishing test $test. It will be discarded and reported as incomplete.")
+                    }
                 }
-            }
-            currentTest = null
+                currentTest = null
 
-            val endTime = timer.currentTimeMillis()
-            val startTime = endTime - Math.round(duration * 1000)
+                val endTime = timer.currentTimeMillis()
+                val startTime = endTime - Math.round(duration * 1000)
 
-            when (result) {
-                "passed" -> {
-                    listeners.forEach { it.testPassed(test, startTime, endTime) }
+                when (result) {
+                    "passed" -> {
+                        listeners.forEach { it.testPassed(test, startTime, endTime) }
+                    }
+                    "failed" -> {
+                        listeners.forEach { it.testFailed(test, startTime, endTime) }
+                    }
+                    else -> logger.error { "Unknown result $result for test $pkg.$clazz.$method" }
                 }
-                "failed" -> {
-                    listeners.forEach { it.testFailed(test, startTime, endTime) }
-                }
-                else -> logger.error { "Unknown result $result for test $pkg.$clazz.$method" }
             }
         }
     }
@@ -125,29 +128,22 @@ class TestRunProgressParser(private val timer: Timer,
         val method = matchResult?.groups?.get(3)?.value
 
         if (pkg != null && clazz != null && method != null) {
-            val test = Test(pkg, clazz, method, getTestMetaProperties(pkg, clazz, method))
-            logger.trace { "Test $pkg.$clazz.$method started" }
+            val targetName = testTargetResolver.targetNameOf(pkg)
+            if (targetName == null) {
+                logger.error("Unable to determine build target of test $pkg.$clazz.$method")
+            } else {
+                val test = Test(pkg, clazz, method, targetName)
+                logger.trace { "Test $pkg.$clazz.$method started" }
 
-            currentTest?.let {
-                logger.error("Current test $it previously started at $currentTestStartTime. It will be discarded and reported as incomplete.")
+                currentTest?.let {
+                    logger.error("Current test $it previously started at $currentTestStartTime. It will be discarded and reported as incomplete.")
+                }
+                currentTest = test
+                currentTestStartTime = timer.currentTimeMillis()
+
+                listeners.forEach { it.testStarted(test) }
             }
-            currentTest = test
-            currentTestStartTime = timer.currentTimeMillis()
-
-            listeners.forEach { it.testStarted(test) }
         }
-    }
-
-    private fun getTestMetaProperties(pkg: String,
-                                      clazz: String,
-                                      method: String): Collection<MetaProperty> {
-        return testBatch.tests.find {
-            it.pkg == pkg &&
-                it.clazz == clazz &&
-                it.method == method
-        }?.let {
-            it.metaProperties
-        }?: emptyList()
     }
 
     private var currentTest: Test? = null
