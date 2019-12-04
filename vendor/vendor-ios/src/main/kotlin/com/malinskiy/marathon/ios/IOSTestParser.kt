@@ -2,6 +2,7 @@ package com.malinskiy.marathon.ios
 
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.execution.TestParser
+import com.malinskiy.marathon.ios.Test
 import com.malinskiy.marathon.ios.testparser.SwiftBinaryTestParser
 import com.malinskiy.marathon.ios.xctestrun.TestBundleInfo
 import com.malinskiy.marathon.ios.xctestrun.Xctestrun
@@ -60,7 +61,7 @@ class IOSTestParser : TestParser {
             .map {
                 val targetName = xctestrun.targetNameFromProductModuleName(it.pkg)
                     ?: throw IllegalStateException("Module ${it.pkg} does not have a matching target in xctestrun")
-                Test(it.pkg, it.clazz, it.method, listOf(testTargetMetaProperty(targetName)))
+                Test(it.pkg, it.clazz, it.method, targetName)
             }
 
         logger.info { "Discovered ${compiledTests.size} tests in ${files.size} executable files."}
@@ -130,7 +131,7 @@ class IOSTestParser : TestParser {
                 if (className != null) { testClassName = className }
 
                 if (testClassName != null && methodName != null)
-                    implementedTests.add(Test(moduleName, testClassName, methodName, listOf(testTargetMetaProperty(targetName))))
+                    implementedTests.add(Test(moduleName, testClassName, methodName, targetName))
             }
         }
 

@@ -36,16 +36,15 @@ class ProgressParserSpek : Spek({
         var mockedTime = mockedStartTimeMillis
 
         val mockTargetProvider = mock(TestTargetResolver::class)
-        val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
-        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
+        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, listOf(mockListener))
 
         beforeEachTest {
             mockedTime = mockedStartTimeMillis
             When calling mockTargetProvider.targetNameOf(any()) itAnswers withFirstArg()
             whenever(mockTimer.currentTimeMillis()).thenAnswer { mockedTime.also { mockedTime = mockedEndTimeMillis } }
         }
-        afterEachTest { reset(mockTimer, mockListener, mockTestBatch, mockTargetProvider) }
+        afterEachTest { reset(mockTimer, mockListener, mockTargetProvider) }
 
         on("parsing a crashing test batch output") {
             val testOutputFile = File(javaClass.classLoader.getResource("fixtures/test_output/crash_0.log").file)
@@ -80,16 +79,15 @@ class ProgressParserSpek : Spek({
 
     describe("TestRunProgressParser") {
         val mockTargetProvider = mock(TestTargetResolver::class)
-        val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
         val mockTimer = mock(Timer::class)
         val mockedTimeMillis = 1537187696000L
         When calling mockTimer.currentTimeMillis() itReturns mockedTimeMillis
 
-        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
+        val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, listOf(mockListener))
 
         beforeEachTest { When calling mockTargetProvider.targetNameOf(any()) itAnswers withFirstArg() }
-        afterEachTest { reset(mockListener, mockTestBatch, mockTargetProvider) }
+        afterEachTest { reset(mockListener, mockTargetProvider) }
 
         on("parsing testing output") {
             val testOutputFile = File(javaClass.classLoader.getResource("fixtures/test_output/success_0.log").file)
