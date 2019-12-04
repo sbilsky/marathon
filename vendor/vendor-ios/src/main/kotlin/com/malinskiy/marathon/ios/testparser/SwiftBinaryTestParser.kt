@@ -1,5 +1,6 @@
 package com.malinskiy.marathon.ios.testparser
 
+import com.malinskiy.marathon.ios.Test
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.Test
 import java.io.BufferedReader
@@ -20,26 +21,32 @@ class SwiftBinaryTestParser(private val binaryParserDockerImageName: String): Do
     }
   }
 
-  override fun listTests(testRunnerPaths: List<File>): List<Test> {
-    return extractTestStrings(testRunnerPaths)
+  override fun listTests(targetName: String, testRunnerPath: File): List<Test> {
+    return extractTestStrings(testRunnerPath)
         .map {
           val (pkg, clazz, method) = TEST_STRING_PATTERN.find(it)
               ?.destructured
               ?: throw IllegalStateException("Invalid test name $it")
 
-          Test(pkg, clazz, method, emptyList())
+          Test(pkg, clazz, method, targetName)
         }
   }
 
-  private fun extractTestStrings(testRunnerPaths: List<File>): List<String> {
-    val pathMappings = testRunnerPaths.map {
-      it.absolutePath to File("/tmp").resolve(it.name).absolutePath }
+  private fun extractTestStrings(testRunnerPath: File): List<String> {
+    val externalPath = testRunnerPath.absolutePath
+    val internalPath = File("/tmp").resolve(testRunnerPath.name).absolutePath
 
     val command =
-        listOf("docker", "run", "--rm") +
-            pathMappings.map { listOf("-v", "${it.first}:${it.second}:ro") }.flatten() +
-            binaryParserDockerImageName +
-            pathMappings.map { it.second }
+      listOf(
+        "docker", "run", "--rm",
+        "-v", "${externalPath}:${internalPath}:ro",
+        binaryParserDockerImageName,
+        internalPath
+      )
+    return execute(command)
+  }
+
+  private fun execute(command: List<String>): List<String> {
 
     logger.debug(command.joinToString(" "))
 
@@ -52,6 +59,8 @@ class SwiftBinaryTestParser(private val binaryParserDockerImageName: String): Do
 
     val output = mutableListOf<String>()
     val outputReader = DockerOutputReader(process.inputStream) { output.add(it) }
+    val errors = mutableListOf<String>()
+    val errorReader = DockerOutputReader(process.errorStream) { errors.add(it) }
     val executor = Executors.newSingleThreadExecutor()
     executor.submit(outputReader)
     return if (process.waitFor() == 0) {
@@ -59,6 +68,7 @@ class SwiftBinaryTestParser(private val binaryParserDockerImageName: String): Do
       output.toList()
     } else {
       executor.shutdown()
+      logger.error(errors.joinToString("\n") { "${it}"})
       throw IllegalStateException("Unable to read list of tests")
     }
   }
