@@ -1,7 +1,7 @@
 package com.malinskiy.marathon.ios.logparser.parser
 
 import com.malinskiy.marathon.ios.logparser.StreamingLogParser
-import com.malinskiy.marathon.ios.logparser.target.TestTargetProvider
+import com.malinskiy.marathon.ios.logparser.target.TestTargetResolver
 import com.malinskiy.marathon.ios.logparser.listener.TestRunListener
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.test.MetaProperty
@@ -10,7 +10,7 @@ import com.malinskiy.marathon.test.TestBatch
 import com.malinskiy.marathon.time.Timer
 
 class TestRunProgressParser(private val timer: Timer,
-                            private val testTargetProvider: TestTargetProvider,
+                            private val testTargetResolver: TestTargetResolver,
                             private val testBatch: TestBatch,
                             private val listeners: Collection<TestRunListener>) : StreamingLogParser {
 
@@ -82,7 +82,7 @@ class TestRunProgressParser(private val timer: Timer,
 
     private fun notifyTestFinished(line: String) {
         val matchResult = TEST_CASE_FINISHED.find(line)
-        val pkg = testTargetProvider.targetOf(matchResult?.groups?.get(1)?.value)
+        val pkg = testTargetResolver.targetNameOf(matchResult?.groups?.get(1)?.value)
         val clazz = matchResult?.groups?.get(2)?.value
         val method = matchResult?.groups?.get(3)?.value
         val result = matchResult?.groups?.get(4)?.value
@@ -117,7 +117,7 @@ class TestRunProgressParser(private val timer: Timer,
 
     private fun notifyTestStarted(line: String) {
         val matchResult = TEST_CASE_STARTED.find(line)
-        val pkg = testTargetProvider.targetOf(matchResult?.groups?.get(1)?.value)
+        val pkg = testTargetResolver.targetNameOf(matchResult?.groups?.get(1)?.value)
         val clazz = matchResult?.groups?.get(2)?.value
         val method = matchResult?.groups?.get(3)?.value
 

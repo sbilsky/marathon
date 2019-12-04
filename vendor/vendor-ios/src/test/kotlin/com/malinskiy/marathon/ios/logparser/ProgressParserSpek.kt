@@ -1,6 +1,6 @@
 package com.malinskiy.marathon.ios.logparser
 
-import com.malinskiy.marathon.ios.logparser.target.TestTargetProvider
+import com.malinskiy.marathon.ios.logparser.target.TestTargetResolver
 import com.malinskiy.marathon.ios.logparser.listener.TestRunListener
 import com.malinskiy.marathon.ios.logparser.parser.TestRunProgressParser
 import com.malinskiy.marathon.test.Test
@@ -35,14 +35,14 @@ class ProgressParserSpek : Spek({
         val mockedEndTimeMillis = 1537187696999L
         var mockedTime = mockedStartTimeMillis
 
-        val mockTargetProvider = mock(TestTargetProvider::class)
+        val mockTargetProvider = mock(TestTargetResolver::class)
         val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
         val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
 
         beforeEachTest {
             mockedTime = mockedStartTimeMillis
-            When calling mockTargetProvider.targetOf(any()) itAnswers withFirstArg()
+            When calling mockTargetProvider.targetNameOf(any()) itAnswers withFirstArg()
             whenever(mockTimer.currentTimeMillis()).thenAnswer { mockedTime.also { mockedTime = mockedEndTimeMillis } }
         }
         afterEachTest { reset(mockTimer, mockListener, mockTestBatch, mockTargetProvider) }
@@ -79,7 +79,7 @@ class ProgressParserSpek : Spek({
     }
 
     describe("TestRunProgressParser") {
-        val mockTargetProvider = mock(TestTargetProvider::class)
+        val mockTargetProvider = mock(TestTargetResolver::class)
         val mockTestBatch = mock(TestBatch::class)
         val mockListener = mock(TestRunListener::class)
         val mockTimer = mock(Timer::class)
@@ -88,7 +88,7 @@ class ProgressParserSpek : Spek({
 
         val progressParser = TestRunProgressParser(mockTimer, mockTargetProvider, mockTestBatch, listOf(mockListener))
 
-        beforeEachTest { When calling mockTargetProvider.targetOf(any()) itAnswers withFirstArg() }
+        beforeEachTest { When calling mockTargetProvider.targetNameOf(any()) itAnswers withFirstArg() }
         afterEachTest { reset(mockListener, mockTestBatch, mockTargetProvider) }
 
         on("parsing testing output") {
@@ -99,7 +99,7 @@ class ProgressParserSpek : Spek({
                     progressParser.onLine(it)
                 }
 
-                verify(mockTargetProvider, atLeastOnce()) that mockTargetProvider.targetOf("sample_appUITests") was called
+                verify(mockTargetProvider, atLeastOnce()) that mockTargetProvider.targetNameOf("sample_appUITests") was called
             }
         }
 
