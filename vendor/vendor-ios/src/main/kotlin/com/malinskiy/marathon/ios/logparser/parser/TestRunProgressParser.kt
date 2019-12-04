@@ -123,7 +123,7 @@ class TestRunProgressParser(private val timer: Timer,
 
     private fun notifyTestStarted(line: String) {
         val matchResult = TEST_CASE_STARTED.find(line)
-        val pkg = testTargetResolver.targetNameOf(matchResult?.groups?.get(1)?.value)
+        val pkg = matchResult?.groups?.get(1)?.value
         val clazz = matchResult?.groups?.get(2)?.value
         val method = matchResult?.groups?.get(3)?.value
 
