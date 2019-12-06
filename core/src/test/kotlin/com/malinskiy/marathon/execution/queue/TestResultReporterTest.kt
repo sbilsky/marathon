@@ -36,6 +36,7 @@ object TestResultReporterSpec : Spek({
             ignoreFailures = null,
             isCodeCoverageEnabled = null,
             fallbackToScreenshots = null,
+            testSuiteNameMatchesClassName = null,
             strictMode = null,
             uncompletedTestRetryQuota = null,
             testClassRegexes = null,

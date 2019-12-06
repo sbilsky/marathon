@@ -29,10 +29,10 @@ object XctestrunSpek : Spek({
             }
 
             it("should accurately determine skipped tests") {
-                val test1 = Test("sample-appUITests", "SkippedSuite", "anyTest", listOf())
-                val test2 = Test("sample-appUITests", "StoryboardTests", "testDisabledButton", listOf())
-                val test3 = Test("sample-appUITests", "StoryboardTests", "testLabel", listOf())
-                val test4 = Test("another-targetUITests", "Patience", "testLabel", listOf())
+                val test1 = Test("sample_appUITests", "SkippedSuite", "anyTest", listOf())
+                val test2 = Test("sample_appUITests", "StoryboardTests", "testDisabledButton", listOf())
+                val test3 = Test("sample_appUITests", "StoryboardTests", "testLabel", listOf())
+                val test4 = Test("another_targetUITests", "Patience", "testLabel", listOf())
 
                 xctestrun.isSkipped(test1) shouldEqual true
                 xctestrun.isSkipped(test2) shouldEqual true

@@ -1,9 +1,10 @@
 package com.malinskiy.marathon.execution.queue
 
 import com.malinskiy.marathon.analytics.Analytics
+import com.malinskiy.marathon.analytics.metrics.MetricsProvider
+import com.malinskiy.marathon.analytics.metrics.MetricsProviderProvider
 import com.malinskiy.marathon.device.DevicePoolId
 import com.malinskiy.marathon.device.DeviceStub
-import com.malinskiy.marathon.device.toDeviceInfo
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.execution.DevicePoolMessage.FromQueue
 import com.malinskiy.marathon.execution.DevicePoolMessage.FromQueue.ExecuteBatch
@@ -18,6 +19,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.reset
 import com.nhaarman.mockitokotlin2.verify
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
+import org.amshove.kluent.When
+import org.amshove.kluent.calling
+import org.amshove.kluent.itReturns
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContainSame
 import org.jetbrains.spek.api.Spek
@@ -38,6 +43,16 @@ class QueueActorSpek : Spek({
         val job by memoized { Job() }
         val poolChannel by memoized { Channel<FromQueue>() }
         val analytics by memoized { mock<Analytics>() }
+        val metricsProviderProvider by memoized { mock<MetricsProviderProvider>() }
+
+        beforeEachTest {
+            When calling metricsProviderProvider.create() itReturns mock<MetricsProvider>()
+            When calling analytics.metricsProviderProvider itReturns metricsProviderProvider
+        }
+
+        afterEachTest {
+            reset(analytics, metricsProviderProvider)
+        }
 
         given("uncompleted tests retry quota is 0, max batch size is 1 and one test in the shard") {
             val actor by memoized {
@@ -241,6 +256,7 @@ private val DEFAULT_CONFIGURATION = Configuration(
         ignoreFailures = null,
         isCodeCoverageEnabled = null,
         fallbackToScreenshots = null,
+        testSuiteNameMatchesClassName = null,
         strictMode = null,
         uncompletedTestRetryQuota = null,
         testClassRegexes = null,
