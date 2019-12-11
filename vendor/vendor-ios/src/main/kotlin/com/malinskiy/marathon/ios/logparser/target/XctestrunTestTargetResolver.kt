@@ -3,10 +3,14 @@ package com.malinskiy.marathon.ios.logparser.target
 import com.malinskiy.marathon.ios.xctestrun.Xctestrun
 
 /**
- * When applied, replaces module name reported in xcodebuild log with testing target name in order
- * to unify test representation.
+ * When applied, informs an xcode target name that corresponds to a module name found in xcodebuild log. Unlike its Android counterpart,
+ * When an iOS test is executed, its module name is used to match execution results in the logs (modules are functionally similar to
+ * packages). However, name of the build target a test belongs to is required in order to start its execution. Module and
+ * target names of a test are the same in most projects, following default naming scheme provided by Xcode. However, that is not
+ * expected and are sometimes configured differently. This class helps to determine target name when necessary, using data from
+ * the provided xctestrun file.
  *
- * @param targetNameMappings a map with target names as keys and product module names as corresponding values.
+ * @param xctestrun a parsed xctestrun file
  */
 class XctestrunTestTargetResolver(xctestrun: Xctestrun): TestTargetResolver {
 
