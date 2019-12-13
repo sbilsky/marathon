@@ -22,6 +22,7 @@ import com.malinskiy.marathon.device.DeviceInfo
 import com.malinskiy.marathon.device.DevicePoolId
 import com.malinskiy.marathon.device.NetworkState
 import com.malinskiy.marathon.device.OperatingSystem
+import com.malinskiy.marathon.exceptions.DeviceLostException
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.execution.TestBatchResults
 import com.malinskiy.marathon.execution.progress.ProgressReporter
@@ -195,7 +196,7 @@ class AndroidDevice(val ddmsDevice: IDevice,
             if (expectedFinish < currentTimeMillis()) {
                 listeners.terminate()
                 testRunResultsListener.forceEnd()
-                throw DeviceTimeoutException("Time for batch exceeded")
+                throw DeviceLostException(DeviceTimeoutException("Time for batch exceeded"))
             }
         }
     }
