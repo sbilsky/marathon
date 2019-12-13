@@ -33,6 +33,7 @@ import com.malinskiy.marathon.report.logs.LogWriter
 import com.malinskiy.marathon.test.MetaProperty
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.TestBatch
+import com.malinskiy.marathon.test.calculateTimeout
 import com.malinskiy.marathon.test.toTestName
 import kotlinx.coroutines.CompletableDeferred
 import java.io.IOException
@@ -115,6 +116,8 @@ class AndroidDeviceTestRunner(private val device: AndroidDevice) {
         }.toTypedArray()
 
         logger.debug { "tests = ${tests.toList()}" }
+
+        val ddmlibMaxTimeToOutputResponse = testBatch.calculateTimeout(configuration)
 
         runner.setRunName("TestRunName")
         runner.setMaxTimeToOutputResponse(configuration.testOutputTimeoutMillis * testBatch.tests.size, TimeUnit.MILLISECONDS)

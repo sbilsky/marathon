@@ -26,6 +26,9 @@ class TestRunResultsListener(private val testBatch: TestBatch,
                              attachmentProviders: List<AttachmentProvider>)
     : AbstractTestRunResultListener(), AttachmentListener {
 
+    private val logger = MarathonLogging.logger("TestRunResultsListener[${device.serialNumber}]")
+
+
     private val attachments: MutableMap<Test, MutableList<Attachment>> = mutableMapOf()
 
     init {
@@ -42,8 +45,6 @@ class TestRunResultsListener(private val testBatch: TestBatch,
 
         attachments[test]!!.add(attachment)
     }
-
-    private val logger = MarathonLogging.logger("TestRunResultsListener")
 
     override fun handleTestRunResults(runResult: DdmLibTestRunResult) {
         val results = mergeParameterisedResults(runResult.testResults)
