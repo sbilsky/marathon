@@ -82,21 +82,24 @@ class QueueActor(private val configuration: Configuration,
         logger.debug { "handle test results ${device.serialNumber}" }
         if (finished.isNotEmpty()) {
             handleFinishedTests(finished, device)
+            logger.debug { "- finished $finished" }
         }
         if (failed.isNotEmpty()) {
             handleFailedTests(failed, device)
+            logger.debug { "- failed $failed" }
         }
         if (uncompleted.isNotEmpty()) {
             uncompleted.forEach {
                 uncompletedTestsRetryCount[it.test] = (uncompletedTestsRetryCount[it.test] ?: 0) + 1
             }
             returnTests(uncompleted.map { it.test })
+            logger.debug { "- uncompleted $uncompleted" }
         }
         activeBatches.remove(device.serialNumber)
     }
 
     private suspend fun onReturnBatch(device: DeviceInfo, batch: TestBatch) {
-        logger.debug { "onReturnBatch ${device.serialNumber}" }
+        logger.debug { "onReturnBatch ${device.serialNumber}, tests ${batch.tests}" }
         returnTests(batch.tests)
         activeBatches.remove(device.serialNumber)
         if (queue.isNotEmpty()) {
