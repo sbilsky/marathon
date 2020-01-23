@@ -14,7 +14,7 @@ data class IOSConfiguration(val derivedDataDir: File,
                             val knownHostsPath: File?,
                             val remoteRsyncPath: String,
                             val debugSsh: Boolean,
-                            val alwaysEraseSimulators: Boolean,
+                            val simulatorAction: SimulatorAction = SimulatorAction.NONE,
                             val hideRunnerOutput: Boolean = false,
                             val compactOutput: Boolean = false,
                             val keepAliveIntervalMillis: Long = 0L,
@@ -25,6 +25,8 @@ data class IOSConfiguration(val derivedDataDir: File,
                             val sourceTargetName: String?,
                             val binaryParserDockerImageName: String? = null,
                             val disableHostKeyVerifier: Boolean = false) : VendorConfiguration {
+
+    enum class SimulatorAction { NONE, ERASE_ONCE, ERASE_ALWAYS }
 
     companion object {
         const val DEFAULT_DEVICE_INITIALIZATION_TIMEOUT_MILLIS: Long = 300_000

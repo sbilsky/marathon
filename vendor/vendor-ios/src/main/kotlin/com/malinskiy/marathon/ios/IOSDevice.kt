@@ -141,7 +141,7 @@ class IOSDevice(val simulator: RemoteSimulator,
         val iosConfiguration = configuration.vendorConfiguration as IOSConfiguration
         val fileManager = FileManager(configuration.outputDir)
 
-        if (iosConfiguration.alwaysEraseSimulators) {
+        if (iosConfiguration.simulatorAction == IOSConfiguration.SimulatorAction.ERASE_ALWAYS) {
             hostCommandExecutor.execOrNull(
                     "xcrun simctl shutdown $udid",
                     configuration.testBatchTimeoutMillis,
@@ -277,8 +277,8 @@ class IOSDevice(val simulator: RemoteSimulator,
 
             this@IOSDevice.derivedDataManager = derivedDataManager
 
-            terminateRunningSimulators()
-            if (!iosConfiguration.alwaysEraseSimulators) {
+            if (iosConfiguration.simulatorAction == IOSConfiguration.SimulatorAction.ERASE_ONCE) {
+                terminateRunningSimulators()
                 try {
                     hostCommandExecutor.exec(
                             "xcrun simctl shutdown $udid",

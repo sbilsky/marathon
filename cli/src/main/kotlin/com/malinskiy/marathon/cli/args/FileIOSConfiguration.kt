@@ -28,7 +28,7 @@ data class FileIOSConfiguration(
         @JsonProperty("sourceRootsRegex") val sourceRootsRegex: Regex? = null,
         @JsonProperty("sourceTargetName") val sourceTargetName: String?,
         @JsonProperty("binaryParserDockerImageName") val binaryParserDockerImageName: String? = null,
-        @JsonProperty("alwaysEraseSimulators") val alwaysEraseSimulators: Boolean?,
+        @JsonProperty("simulatorAction") val simulatorAction: IOSConfiguration.SimulatorAction = IOSConfiguration.SimulatorAction.NONE,
         @JsonProperty("debugSsh") val debugSsh: Boolean?,
         @JsonProperty("hideRunnerOutput") val hideRunnerOutput: Boolean?,
         @JsonProperty("compactOutput") val compactOutput: Boolean = false,
@@ -50,7 +50,6 @@ data class FileIOSConfiguration(
         val optionalSourceRoot = sourceRootOverride
                 ?: sourceRoot?.resolveAgainst(marathonfileDir)
         val optionalDebugSsh = debugSsh ?: false
-        val optionalAlwaysEraseSimulators = alwaysEraseSimulators ?: true
         val optionalDevices = devices?.resolveAgainst(marathonfileDir)
                 ?: marathonfileDir.resolve("Marathondevices")
         val optionalKnownHostsPath = knownHostsPath?.resolveAgainst(marathonfileDir)
@@ -67,7 +66,7 @@ data class FileIOSConfiguration(
                     knownHostsPath = optionalKnownHostsPath,
                     remoteRsyncPath = remoteRsyncPath,
                     debugSsh = optionalDebugSsh,
-                    alwaysEraseSimulators = optionalAlwaysEraseSimulators,
+                    simulatorAction = simulatorAction,
                     hideRunnerOutput = optionalHideRunnerOutput,
                     compactOutput = compactOutput,
                     keepAliveIntervalMillis = keepAliveIntervalMillis,
@@ -86,7 +85,7 @@ data class FileIOSConfiguration(
                     knownHostsPath = optionalKnownHostsPath,
                     remoteRsyncPath = remoteRsyncPath,
                     debugSsh = optionalDebugSsh,
-                    alwaysEraseSimulators = optionalAlwaysEraseSimulators,
+                    simulatorAction = simulatorAction,
                     hideRunnerOutput = optionalHideRunnerOutput,
                     compactOutput = compactOutput,
                     keepAliveIntervalMillis = keepAliveIntervalMillis,

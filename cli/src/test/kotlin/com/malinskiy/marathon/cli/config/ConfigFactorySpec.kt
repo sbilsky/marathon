@@ -47,7 +47,6 @@ import org.amshove.kluent.shouldContainAll
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldNotThrow
 import org.amshove.kluent.shouldThrow
-import org.influxdb.InfluxDB
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
@@ -213,7 +212,7 @@ object ConfigFactorySpec : Spek({
                         knownHostsPath = file.parentFile.resolve("known_hosts"),
                         remoteRsyncPath = "/usr/local/bin/rsync",
                         debugSsh = true,
-                        alwaysEraseSimulators = false,
+                        simulatorAction = IOSConfiguration.SimulatorAction.ERASE_ALWAYS,
                         hideRunnerOutput = true,
                         compactOutput = true,
                         keepAliveIntervalMillis = 300_000L,

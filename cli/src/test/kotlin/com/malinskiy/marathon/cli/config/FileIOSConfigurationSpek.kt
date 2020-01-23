@@ -4,6 +4,7 @@ package com.malinskiy.marathon.cli.config
 import com.malinskiy.marathon.cli.args.FileIOSConfiguration
 import com.malinskiy.marathon.cli.args.FileListProvider
 import com.malinskiy.marathon.exceptions.ConfigurationException
+import com.malinskiy.marathon.ios.IOSConfiguration
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldThrow
 import org.jetbrains.spek.api.Spek
@@ -32,7 +33,7 @@ object FileIOSConfigurationSpek : Spek({
                     sourceRoot = File("sourceRoot"),
                     fileListProvider = mockFileListProvider,
                     debugSsh = null,
-                    alwaysEraseSimulators = true,
+                    simulatorAction = IOSConfiguration.SimulatorAction.NONE,
                     hideRunnerOutput = null,
                     deviceInitializationTimeoutMillis = null,
                     devices = null,

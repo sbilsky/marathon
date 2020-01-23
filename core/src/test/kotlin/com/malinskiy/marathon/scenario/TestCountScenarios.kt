@@ -24,6 +24,8 @@ object TestCountScenarios : Spek({
                     override fun print(testCount: Int) {
                         printedTestCount = testCount
                     }
+
+                    override fun print(versionString: String) { }
                 }
                 val context = TestCoroutineContext("testing context")
 
