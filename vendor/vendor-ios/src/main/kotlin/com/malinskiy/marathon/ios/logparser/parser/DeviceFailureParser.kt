@@ -7,6 +7,7 @@ class DeviceFailureParser: StreamingLogParser {
         "Failed to install or launch the test runner",
         "Software caused connection abort",
         "Unable to find a destination matching the provided destination specifier",
+        "SpringBoard crashed in",
         "Terminating since there is no system app",
         "Exiting because the workspace server has disconnected",
         "Not authorized for performing UI testing PropertyActions",
@@ -30,6 +31,7 @@ class DeviceFailureParser: StreamingLogParser {
                         0 -> DeviceFailureReason.FailedRunner
                         1 -> DeviceFailureReason.ConnectionAbort
                         2 -> DeviceFailureReason.InvalidSimulatorIdentifier
+                        3 -> DeviceFailureReason.SpringboardCrash
                         else -> DeviceFailureReason.Unknown
                     },
                     it
