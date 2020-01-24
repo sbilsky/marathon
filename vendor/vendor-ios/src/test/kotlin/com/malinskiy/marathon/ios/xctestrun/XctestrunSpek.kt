@@ -1,6 +1,8 @@
 package com.malinskiy.marathon.ios.xctestrun
 
+import com.malinskiy.marathon.ios.Test
 import com.malinskiy.marathon.test.Test
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldContainSame
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldHaveKey
@@ -30,15 +32,15 @@ object XctestrunSpek : Spek({
             }
 
             it("should accurately determine skipped tests") {
-                val test1 = Test("sample-appUITests", "SkippedSuite", "anyTest", listOf())
-                val test2 = Test("sample-appUITests", "StoryboardTests", "testDisabledButton", listOf())
-                val test3 = Test("sample-appUITests", "StoryboardTests", "testLabel", listOf())
-                val test4 = Test("another-targetUITests", "Patience", "testLabel", listOf())
+                val test1 = Test("sample_appUITests", "SkippedSuite", "anyTest", "sample-appUITests")
+                val test2 = Test("sample_appUITests", "StoryboardTests", "testDisabledButton", "sample-appUITests")
+                val test3 = Test("sample_appUITests", "StoryboardTests", "testLabel", "sample-appUITests")
+                val test4 = Test("another_targetUITests", "Patience", "testLabel", "sample-appUITests")
 
-                xctestrun.isSkipped(test1) shouldEqual true
-                xctestrun.isSkipped(test2) shouldEqual true
-                xctestrun.isSkipped(test3) shouldEqual false
-                xctestrun.isSkipped(test4) shouldEqual false
+                xctestrun.isSkipped(test1) shouldBe true
+                xctestrun.isSkipped(test2) shouldBe true
+                xctestrun.isSkipped(test3) shouldBe false
+                xctestrun.isSkipped(test4) shouldBe false
             }
         }
         given("A valid instance") {

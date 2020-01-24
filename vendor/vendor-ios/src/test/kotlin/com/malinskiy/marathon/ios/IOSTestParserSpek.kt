@@ -46,7 +46,6 @@ object IOSTestParserSpek : Spek({
                             remoteRsyncPath = "/remote/rsync",
                             sourceRoot = sourceRoot,
                             debugSsh = false,
-                            alwaysEraseSimulators = true,
                             sourceTargetName = null),
                     analyticsTracking = false
             )
@@ -55,25 +54,25 @@ object IOSTestParserSpek : Spek({
                 val extractedTests = parser.extract(configuration)
 
                 extractedTests shouldContainSame listOf(
-                    Test("sample-appUITests", "StoryboardTests", "testButton", emptyList()),
-                    Test("sample-appUITests", "StoryboardTests", "testLabel", emptyList()),
-                    Test("sample-appUITests", "MoreTests", "testPresentModal", emptyList()),
-                    Test("sample-appUITests", "CrashingTests", "testButton", emptyList()),
-                    Test("sample-appUITests", "FailingTests", "testAlwaysFailing", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky1", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky2", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky3", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky4", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky5", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky6", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky7", emptyList()),
-                    Test("sample-appUITests", "FlakyTests", "testTextFlaky8", emptyList()),
-                    Test("sample-appUITests", "SlowTests", "testTextSlow", emptyList()),
-                    Test("sample-appUITests", "SlowTests", "testTextSlow1", emptyList()),
-                    Test("sample-appUITests", "SlowTests", "testTextSlow2", emptyList()),
-                    Test("sample-appUITests", "SlowTests", "testTextSlow3", emptyList()),
-                    Test("sample-appUITests", "SlowTests", "testTextSlow4", emptyList())
+                    Test("sample_appUITests", "StoryboardTests", "testButton", "sample-appUITests"),
+                    Test("sample_appUITests", "StoryboardTests", "testLabel", "sample-appUITests"),
+                    Test("sample_appUITests", "MoreTests", "testPresentModal", "sample-appUITests"),
+                    Test("sample_appUITests", "CrashingTests", "testButton", "sample-appUITests"),
+                    Test("sample_appUITests", "FailingTests", "testAlwaysFailing", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky1", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky2", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky3", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky4", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky5", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky6", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky7", "sample-appUITests"),
+                    Test("sample_appUITests", "FlakyTests", "testTextFlaky8", "sample-appUITests"),
+                    Test("sample_appUITests", "SlowTests", "testTextSlow", "sample-appUITests"),
+                    Test("sample_appUITests", "SlowTests", "testTextSlow1", "sample-appUITests"),
+                    Test("sample_appUITests", "SlowTests", "testTextSlow2", "sample-appUITests"),
+                    Test("sample_appUITests", "SlowTests", "testTextSlow3", "sample-appUITests"),
+                    Test("sample_appUITests", "SlowTests", "testTextSlow4", "sample-appUITests")
                 )
             }
         }
