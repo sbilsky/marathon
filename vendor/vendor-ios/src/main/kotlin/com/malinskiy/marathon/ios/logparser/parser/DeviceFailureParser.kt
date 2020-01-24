@@ -8,6 +8,7 @@ class DeviceFailureParser: StreamingLogParser {
         "Software caused connection abort",
         "Unable to find a destination matching the provided destination specifier",
         "SpringBoard crashed in",
+        "backboardd crashed in",
         "Terminating since there is no system app",
         "Exiting because the workspace server has disconnected",
         "Not authorized for performing UI testing PropertyActions",
