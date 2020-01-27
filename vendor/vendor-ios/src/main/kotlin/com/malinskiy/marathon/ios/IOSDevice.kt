@@ -172,7 +172,8 @@ class IOSDevice(val simulator: RemoteSimulator,
             testBatch,
             deferred,
             progressReporter,
-            iosConfiguration.hideRunnerOutput
+            iosConfiguration.hideRunnerOutput,
+            iosConfiguration.ignoreSystemProcessCrashes
         )
 
         val command =

@@ -212,6 +212,7 @@ object ConfigFactorySpec : Spek({
                         knownHostsPath = file.parentFile.resolve("known_hosts"),
                         remoteRsyncPath = "/usr/local/bin/rsync",
                         debugSsh = true,
+                        ignoreSystemProcessCrashes = true,
                         simulatorAction = IOSConfiguration.SimulatorAction.ERASE_ALWAYS,
                         hideRunnerOutput = true,
                         compactOutput = true,

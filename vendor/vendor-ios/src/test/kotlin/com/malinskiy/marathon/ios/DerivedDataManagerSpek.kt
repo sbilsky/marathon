@@ -85,6 +85,7 @@ object DerivedDataManagerSpek: Spek({
                             sourceRoot = sourceRoot,
                             sourceRootsRegex = null,
                             debugSsh = false,
+                            ignoreSystemProcessCrashes = false,
                             sourceTargetName = null),
                     analyticsTracking = false
             )

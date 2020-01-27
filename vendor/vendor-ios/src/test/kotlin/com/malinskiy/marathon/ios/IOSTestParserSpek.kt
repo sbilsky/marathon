@@ -1,7 +1,6 @@
 package com.malinskiy.marathon.ios
 
 import com.malinskiy.marathon.execution.Configuration
-import com.malinskiy.marathon.test.Test
 import org.amshove.kluent.shouldContainSame
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -46,6 +45,7 @@ object IOSTestParserSpek : Spek({
                             remoteRsyncPath = "/remote/rsync",
                             sourceRoot = sourceRoot,
                             debugSsh = false,
+                            ignoreSystemProcessCrashes = false,
                             sourceTargetName = null),
                     analyticsTracking = false
             )
