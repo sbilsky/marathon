@@ -33,6 +33,7 @@ class DeviceFailureParser: StreamingLogParser {
                         1 -> DeviceFailureReason.ConnectionAbort
                         2 -> DeviceFailureReason.InvalidSimulatorIdentifier
                         3 -> DeviceFailureReason.SpringboardCrash
+                        4 -> DeviceFailureReason.BackboarddCrash
                         else -> DeviceFailureReason.Unknown
                     },
                     it
