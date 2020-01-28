@@ -4,6 +4,7 @@ import com.dd.plist.PropertyListParser
 import com.malinskiy.marathon.ios.IOSDevice
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.malinskiy.marathon.ios.cmd.remote.SshjCommandUnresponsiveException
 import com.malinskiy.marathon.ios.logparser.parser.DeviceFailureException
 import com.malinskiy.marathon.ios.logparser.parser.DeviceFailureReason
 import com.malinskiy.marathon.ios.simctl.model.SimctlDevice
@@ -68,6 +69,10 @@ class Simctl {
 
     private fun exec(args: String, device: IOSDevice): String {
         val command = "xcrun simctl $args"
-        return device.hostCommandExecutor.execBlocking(command).stdout
+        return try {
+            device.hostCommandExecutor.execBlocking(command).stdout
+        } catch(e: SshjCommandUnresponsiveException) {
+            throw DeviceFailureException(DeviceFailureReason.Unknown, e)
+        }
     }
 }
