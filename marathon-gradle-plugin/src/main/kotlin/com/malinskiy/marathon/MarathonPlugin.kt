@@ -6,6 +6,9 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.android.build.gradle.api.BaseVariantOutput
 import com.android.build.gradle.api.TestVariant
+import com.malinskiy.marathon.config.AppType
+import com.malinskiy.marathon.exceptions.BugsnagExceptionsReporter
+import com.malinskiy.marathon.exceptions.ExceptionsReporter
 import com.malinskiy.marathon.extensions.executeGradleCompat
 import com.malinskiy.marathon.log.MarathonLogging
 import org.gradle.api.Plugin
@@ -21,6 +24,8 @@ class MarathonPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         log.info { "Applying marathon plugin" }
+        val exceptionsReporter = BugsnagExceptionsReporter()
+        exceptionsReporter.start(AppType.GRADLE_PLUGIN)
 
         val extension: MarathonExtension = project.extensions.create("marathon", MarathonExtension::class.java, project)
 
@@ -49,14 +54,14 @@ class MarathonPlugin : Plugin<Project> {
 
             testedExtension!!.testVariants.all {
                 log.info { "Applying marathon for $this" }
-                val testTaskForVariant = createTask(this, project, conf, testedExtension.sdkDirectory)
+                val testTaskForVariant = createTask(this, project, conf, testedExtension.sdkDirectory, exceptionsReporter)
                 marathonTask.dependsOn(testTaskForVariant)
             }
         }
     }
 
     companion object {
-        private fun createTask(variant: TestVariant, project: Project, config: MarathonExtension, sdkDirectory: File): MarathonRunTask {
+        private fun createTask(variant: TestVariant, project: Project, config: MarathonExtension, sdkDirectory: File, exceptionsReporter: ExceptionsReporter): MarathonRunTask {
             checkTestVariants(variant)
 
             val marathonTask = project.tasks.create("$TASK_PREFIX${variant.name.capitalize()}", MarathonRunTask::class.java)
@@ -76,15 +81,15 @@ class MarathonPlugin : Plugin<Project> {
                     extensionConfig = config
                     sdk = sdkDirectory
                     outputs.upToDateWhen { false }
-
+                    exceptionsTracker = exceptionsReporter
                     executeGradleCompat(
-                            exec = {
-                                dependsOn(variant.testedVariant.assembleProvider, variant.assembleProvider)
-                            },
-                            fallback = {
-                                @Suppress("DEPRECATION")
-                                dependsOn(variant.testedVariant.assemble, variant.assemble)
-                            }
+                        exec = {
+                            dependsOn(variant.testedVariant.assembleProvider, variant.assembleProvider)
+                        },
+                        fallback = {
+                            @Suppress("DEPRECATION")
+                            dependsOn(variant.testedVariant.assemble, variant.assemble)
+                        }
                     )
                 })
             }
@@ -107,9 +112,11 @@ class MarathonPlugin : Plugin<Project> {
          */
         private fun checkTestedVariants(baseVariantOutput: BaseVariantOutput) {
             if (baseVariantOutput.outputs.size > 1) {
-                throw UnsupportedOperationException("The Marathon plugin does not support abi splits for app APKs, " +
-                        "but supports testing via a universal APK. "
-                        + "Add the flag \"universalApk true\" in the android.splits.abi configuration.")
+                throw UnsupportedOperationException(
+                    "The Marathon plugin does not support abi splits for app APKs, " +
+                            "but supports testing via a universal APK. "
+                            + "Add the flag \"universalApk true\" in the android.splits.abi configuration."
+                )
             }
 
         }

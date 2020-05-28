@@ -1,8 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.gradle.api.plugins.ExtensionAware
-import org.junit.platform.gradle.plugin.FiltersExtension
 import org.junit.platform.gradle.plugin.EnginesExtension
+import org.junit.platform.gradle.plugin.FiltersExtension
 import org.junit.platform.gradle.plugin.JUnitPlatformExtension
 
 plugins {
@@ -17,13 +15,13 @@ plugins {
 val enableJDB = false
 val debugCoroutines = true
 val jvmOptions = listOf(
-    when(enableJDB) {
-      true -> "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044"
-      else -> ""
+    when (enableJDB) {
+        true -> "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=1044"
+        else -> ""
     },
-    when(debugCoroutines) {
-      true -> "-Dkotlinx.coroutines.debug=on"
-      else -> ""
+    when (debugCoroutines) {
+        true -> "-Dkotlinx.coroutines.debug=on"
+        else -> ""
     }
 ).filter { it.isNotBlank() }
 
@@ -47,7 +45,8 @@ tasks.withType<KotlinCompile> {
 dependencies {
     implementation(project(":core"))
     implementation(project(":vendor:vendor-ios"))
-    implementation(project(":vendor:vendor-android"))
+    implementation(project(":vendor:vendor-android:base"))
+    implementation(project(":vendor:vendor-android:ddmlib"))
     implementation(project(":analytics:usage"))
     implementation(Libraries.kotlinStdLib)
     implementation(Libraries.kotlinCoroutines)
@@ -61,6 +60,7 @@ dependencies {
     implementation(Libraries.jacksonKotlin)
     implementation(Libraries.jacksonYaml)
     implementation(Libraries.jacksonJSR310)
+    implementation(Libraries.apacheCommonsText)
     testCompile(TestLibraries.kluent)
     testCompile(TestLibraries.mockitoKotlin)
     testCompile(TestLibraries.spekAPI)

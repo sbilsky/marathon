@@ -1,6 +1,7 @@
 package com.malinskiy.marathon.execution
 
-import com.malinskiy.marathon.analytics.Analytics
+import com.malinskiy.marathon.analytics.external.Analytics
+import com.malinskiy.marathon.analytics.internal.pub.Track
 import com.malinskiy.marathon.device.Device
 import com.malinskiy.marathon.device.DevicePoolId
 import com.malinskiy.marathon.device.DeviceProvider
@@ -28,12 +29,15 @@ import kotlin.coroutines.CoroutineContext
  * 2) Create device pools using PoolingStrategy
  */
 
-class Scheduler(private val deviceProvider: DeviceProvider,
-                private val analytics: Analytics,
-                private val configuration: Configuration,
-                private val shard: TestShard,
-                private val progressReporter: ProgressReporter,
-                override val coroutineContext: CoroutineContext) : CoroutineScope {
+class Scheduler(
+    private val deviceProvider: DeviceProvider,
+    private val analytics: Analytics,
+    private val configuration: Configuration,
+    private val shard: TestShard,
+    private val progressReporter: ProgressReporter,
+    private val track: Track,
+    override val coroutineContext: CoroutineContext
+) : CoroutineScope {
 
     private val job = Job()
     private val pools = ConcurrentHashMap<DevicePoolId, SendChannel<FromScheduler>>()
@@ -58,10 +62,6 @@ class Scheduler(private val deviceProvider: DeviceProvider,
         }
     }
 
-    fun getPools(): List<DevicePoolId> {
-        return pools.keys.toList()
-    }
-
     private fun subscribeOnDevices(job: Job): Job {
         return launch {
             for (msg in deviceProvider.subscribe()) {
@@ -79,7 +79,7 @@ class Scheduler(private val deviceProvider: DeviceProvider,
 
     private suspend fun onDeviceDisconnected(item: DeviceProvider.DeviceEvent.DeviceDisconnected) {
         val device = item.device
-        if(filteredByConfiguration(device)) {
+        if (filteredByConfiguration(device)) {
             logger.debug { "device ${device.serialNumber} is filtered out by configuration. skipping disconnect" }
             return
         }
@@ -90,11 +90,13 @@ class Scheduler(private val deviceProvider: DeviceProvider,
         }
     }
 
-    private suspend fun onDeviceConnected(item: DeviceProvider.DeviceEvent.DeviceConnected,
-                                          parent: Job,
-                                          context: CoroutineContext) {
+    private suspend fun onDeviceConnected(
+        item: DeviceProvider.DeviceEvent.DeviceConnected,
+        parent: Job,
+        context: CoroutineContext
+    ) {
         val device = item.device
-        if(filteredByConfiguration(device)) {
+        if (filteredByConfiguration(device)) {
             logger.debug { "device ${device.serialNumber} is filtered out by configuration. skipping" }
             return
         }
@@ -103,13 +105,13 @@ class Scheduler(private val deviceProvider: DeviceProvider,
         logger.debug { "device ${device.serialNumber} associated with poolId ${poolId.name}" }
         pools.computeIfAbsent(poolId) { id ->
             logger.debug { "pool actor ${id.name} is being created" }
-            DevicePoolActor(id, configuration, analytics, shard, progressReporter, parent, context)
+            DevicePoolActor(id, configuration, analytics, shard, progressReporter, track, parent, context)
         }
         pools[poolId]?.send(AddDevice(device)) ?: logger.debug {
             "not sending the AddDevice event " +
                     "to device pool for ${device.serialNumber}"
         }
-        analytics.trackDeviceConnected(poolId, device.toDeviceInfo())
+        track.deviceConnected(poolId, device.toDeviceInfo())
     }
 
     private fun filteredByConfiguration(device: Device): Boolean {

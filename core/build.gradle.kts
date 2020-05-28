@@ -1,9 +1,7 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
-import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.junit.platform.gradle.plugin.FiltersExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.junit.platform.gradle.plugin.EnginesExtension
+import org.junit.platform.gradle.plugin.FiltersExtension
 import org.junit.platform.gradle.plugin.JUnitPlatformExtension
 
 plugins {
@@ -13,6 +11,7 @@ plugins {
     id("org.jetbrains.dokka")
     id("org.junit.platform.gradle.plugin")
     jacoco
+    id("de.fuerstenau.buildconfig") version "1.1.8"
 }
 
 sourceSets {
@@ -28,6 +27,12 @@ sourceSets {
             kotlin.srcDirs("src/integrationTest/kotlin")
         }
     }
+}
+
+buildConfig {
+    appName = project.name
+    version = Versions.marathon
+    buildConfigField("String", "BUGSNAG_TOKEN", System.getenv("BUGSNAG_TOKEN"))
 }
 
 dependencies {
@@ -48,14 +53,17 @@ dependencies {
     implementation(Libraries.slf4jAPI)
     implementation(Libraries.logbackClassic)
     implementation(Libraries.influxDbClient)
-    testCompile(project(":vendor:vendor-test"))
-    testCompile(TestLibraries.kluent)
-    testCompile(TestLibraries.spekAPI)
+    api(Libraries.koin)
+    api(Libraries.bugsnag)
+    testImplementation(project(":vendor:vendor-test"))
+    testImplementation(TestLibraries.kluent)
+    testImplementation(TestLibraries.spekAPI)
+    testImplementation(TestLibraries.testContainers)
+    testImplementation(TestLibraries.testContainersInflux)
+    testImplementation(TestLibraries.mockitoKotlin)
+    testImplementation(TestLibraries.koin)
     testRuntime(TestLibraries.spekJUnitPlatformEngine)
     testRuntime(TestLibraries.jupiterEngine)
-    testCompile(TestLibraries.testContainers)
-    testCompile(TestLibraries.testContainersInflux)
-    testImplementation(TestLibraries.mockitoKotlin)
 }
 
 tasks.named<JacocoReport>("jacocoTestReport").configure {
