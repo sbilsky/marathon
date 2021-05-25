@@ -86,6 +86,8 @@ class Marathon(val configuration: Configuration) {
             log.debug(th.stackTrace.joinToString { "$it" })
             false
         }
+        log.debug("Done running.")
+        val threads = Thread.getAllStackTraces().keys.joinToString(separator = ",") { it.toString() }
     }
 
     suspend fun runAsync(printTestCountAndExit: Boolean = false, outputPrinter: OutputPrinter? = null): Boolean {
@@ -135,7 +137,10 @@ class Marathon(val configuration: Configuration) {
 
         analytics.terminate()
         deviceProvider.terminate()
-        return progressReporter.aggregateResult()
+        log.debug("Aggregating result...")
+        val finalResult = progressReporter.aggregateResult()
+        log.debug("Done aggregating result.")
+        return finalResult
     }
 
     private fun printSummary(scheduler: Scheduler, executionTime: Long) {
