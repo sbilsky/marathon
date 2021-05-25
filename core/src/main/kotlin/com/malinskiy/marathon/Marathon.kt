@@ -79,15 +79,16 @@ class Marathon(val configuration: Configuration) {
     }
 
     fun run(printTestCountAndExit: Boolean = false, outputPrinter: OutputPrinter? = null) = runBlocking {
-        try {
+        val result = try {
             runAsync(printTestCountAndExit = printTestCountAndExit, outputPrinter = outputPrinter)
         } catch (th: Throwable) {
             log.error(th.toString())
             log.debug(th.stackTrace.joinToString { "$it" })
             false
         }
-        log.debug("Done running.")
         val threads = Thread.getAllStackTraces().keys.joinToString(separator = ",") { it.toString() }
+        log.debug("Done running ${threads}")
+        result
     }
 
     suspend fun runAsync(printTestCountAndExit: Boolean = false, outputPrinter: OutputPrinter? = null): Boolean {
