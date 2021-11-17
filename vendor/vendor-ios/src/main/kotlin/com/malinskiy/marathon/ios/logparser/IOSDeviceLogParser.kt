@@ -52,7 +52,6 @@ class IOSDeviceLogParser(device: Device,
                             deferredResults = deferredResults,
                             progressReporter = progressReporter,
                             testLogListener = testLogListener,
-                            diagnosticLogsPathFinder = diagnosticLogsPathFinder,
                             derivedDataPath = derivedDataPath
                         ),
                         testLogListener

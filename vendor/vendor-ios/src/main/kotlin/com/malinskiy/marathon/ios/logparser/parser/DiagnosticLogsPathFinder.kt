@@ -2,7 +2,7 @@ package com.malinskiy.marathon.ios.logparser.parser
 
 import com.malinskiy.marathon.ios.logparser.StreamingLogParser
 
-class DiagnosticLogsPathFinder(val labels: Collection<String>): StreamingLogParser {
+class DiagnosticLogsPathFinder : StreamingLogParser {
 
     /*
     Output removed in Xcode 13, previously used to detect log paths
