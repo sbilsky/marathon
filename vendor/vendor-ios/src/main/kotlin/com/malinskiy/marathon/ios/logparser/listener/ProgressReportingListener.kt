@@ -18,7 +18,8 @@ class ProgressReportingListener(private val device: Device,
                                 private val deferredResults: CompletableDeferred<TestBatchResults>,
                                 private val progressReporter: ProgressReporter,
                                 private val testLogListener: TestLogListener,
-                                private val diagnosticLogsPathFinder: DiagnosticLogsPathFinder): TestRunListener {
+                                private val diagnosticLogsPathFinder: DiagnosticLogsPathFinder,
+                                private val derivedDataPath: String): TestRunListener {
 
     private val success: MutableList<TestResult> = mutableListOf()
     private val failure: MutableList<TestResult> = mutableListOf()
@@ -50,6 +51,6 @@ class ProgressReportingListener(private val device: Device,
     private fun getLastLog() = (
             listOf(testLogListener.getLastLog()) +
             diagnosticLogsPathFinder.labels +
-            "/tmp/DerivedData/${device.serialNumber}-${testBatch.hashCode()}")
+            derivedDataPath)
             .joinToString("\n")
 }

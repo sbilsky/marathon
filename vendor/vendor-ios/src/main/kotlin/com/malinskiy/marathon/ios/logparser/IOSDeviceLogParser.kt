@@ -19,7 +19,8 @@ class IOSDeviceLogParser(device: Device,
                          deferredResults: CompletableDeferred<TestBatchResults>,
                          progressReporter: ProgressReporter,
                          hideRunnerOutput: Boolean,
-                         ignoreSystemProcessCrashes: Boolean): StreamingLogParser {
+                         ignoreSystemProcessCrashes: Boolean,
+                         derivedDataPath: String): StreamingLogParser {
 
     private val underlyingLogParser: StreamingLogParser
     private val testLogListener: TestLogListener
@@ -51,7 +52,8 @@ class IOSDeviceLogParser(device: Device,
                             deferredResults = deferredResults,
                             progressReporter = progressReporter,
                             testLogListener = testLogListener,
-                            diagnosticLogsPathFinder = diagnosticLogsPathFinder
+                            diagnosticLogsPathFinder = diagnosticLogsPathFinder,
+                            derivedDataPath = derivedDataPath
                         ),
                         testLogListener
                     )
