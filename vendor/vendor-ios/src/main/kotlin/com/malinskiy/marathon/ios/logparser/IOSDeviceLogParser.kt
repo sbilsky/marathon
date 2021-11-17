@@ -28,10 +28,7 @@ class IOSDeviceLogParser(device: Device,
     private val sessionResultsPathFinder: SessionResultsPathFinder
     init {
         testLogListener = TestLogListener()
-        diagnosticLogsPathFinder = DiagnosticLogsPathFinder(listOf(
-                device.serialNumber,
-                device.toDeviceInfo().serialNumber
-        ).distinct())
+        diagnosticLogsPathFinder = DiagnosticLogsPathFinder()
         sessionResultsPathFinder = SessionResultsPathFinder()
         underlyingLogParser = CompositeLogParser(
             listOf(
