@@ -50,6 +50,6 @@ class ProgressReportingListener(private val device: Device,
     private fun getLastLog() = (
             listOf(testLogListener.getLastLog()) +
             diagnosticLogsPathFinder.labels +
-            "/Users/master/Library/Developer/Xcode/DerivedData/${device.serialNumber}")
+            "/tmp/DerivedData/${device.serialNumber}")
             .joinToString("\n")
 }
