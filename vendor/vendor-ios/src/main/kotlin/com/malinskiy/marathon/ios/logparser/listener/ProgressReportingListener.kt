@@ -6,7 +6,6 @@ import com.malinskiy.marathon.execution.TestBatchResults
 import com.malinskiy.marathon.execution.TestResult
 import com.malinskiy.marathon.execution.TestStatus
 import com.malinskiy.marathon.execution.progress.ProgressReporter
-import com.malinskiy.marathon.ios.logparser.parser.DiagnosticLogsPathFinder
 import com.malinskiy.marathon.test.Test
 import com.malinskiy.marathon.test.TestBatch
 import com.malinskiy.marathon.test.toSafeTestName
@@ -18,7 +17,7 @@ class ProgressReportingListener(private val device: Device,
                                 private val deferredResults: CompletableDeferred<TestBatchResults>,
                                 private val progressReporter: ProgressReporter,
                                 private val testLogListener: TestLogListener,
-                                private val diagnosticLogsPathFinder: DiagnosticLogsPathFinder): TestRunListener {
+                                private val derivedDataPath: String): TestRunListener {
 
     private val success: MutableList<TestResult> = mutableListOf()
     private val failure: MutableList<TestResult> = mutableListOf()
@@ -49,7 +48,7 @@ class ProgressReportingListener(private val device: Device,
 
     private fun getLastLog() = (
             listOf(testLogListener.getLastLog()) +
-            diagnosticLogsPathFinder.labels +
-            diagnosticLogsPathFinder.diagnosticLogPaths)
+            device.serialNumber +
+            derivedDataPath)
             .joinToString("\n")
 }

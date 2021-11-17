@@ -165,6 +165,7 @@ class IOSDevice(val simulator: RemoteSimulator,
 
         logger.debug("Tests = ${testBatch.tests.toList()}")
 
+        val derivedDataPath ="/tmp/DerivedData/$serialNumber-${testBatch.hashCode()}"
         val logParser = IOSDeviceLogParser(
             this@IOSDevice,
             testTargetProvider,
@@ -173,7 +174,8 @@ class IOSDevice(val simulator: RemoteSimulator,
             deferred,
             progressReporter,
             iosConfiguration.hideRunnerOutput,
-            iosConfiguration.ignoreSystemProcessCrashes
+            iosConfiguration.ignoreSystemProcessCrashes,
+            derivedDataPath
         )
 
         val command =
@@ -183,6 +185,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                 "NSUnbufferedIO=YES",
                 "xcodebuild test-without-building",
                 "-disable-concurrent-destination-testing",
+                "-derivedDataPath $derivedDataPath",
                 "-xctestrun ${remoteXctestrunFile.path}",
                 testBatch.toXcodebuildArguments(),
                 "-destination 'platform=iOS simulator,id=$udid' ;",
