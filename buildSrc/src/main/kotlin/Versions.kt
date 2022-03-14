@@ -33,7 +33,7 @@ object Versions {
     val jacksonJSR310 = "2.9.6"
     val ddPlist = "1.21"
     val guava = "26.0-jre"
-    val rsync4j = "3.1.2-12"
+    val rsync4j = "3.2.3-9"
     val sshj = "0.26.0"
     val testContainers = "1.9.1"
     val jupiterEngine = "5.1.0"
