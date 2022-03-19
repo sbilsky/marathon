@@ -30,7 +30,7 @@ class DerivedDataManager(val configuration: Configuration) {
         get() = iosConfiguration.xctestrunPath
 
     init {
-        if (configuration.debug) {
+        if (true) {
             logger.trace(rsyncVersion)
         }
         if (!iosConfiguration.remotePrivateKey.exists()) {
@@ -109,7 +109,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 .partialDir(".rsync-partial")
                 .delayUpdates(true)
                 .rsyncPath(iosConfiguration.remoteRsyncPath)
-                .verbose(configuration.debug)
+                .verbose(true)
     }
 
     private fun getSshString(port: Int): String {
@@ -117,7 +117,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 "-i ${iosConfiguration.remotePrivateKey} " +
                 "-l ${iosConfiguration.remoteUsername} " +
                 "-p ${port.toString()} " +
-                when (configuration.debug && iosConfiguration.debugSsh) { true -> "-vvv" else -> ""}
+                when (true && iostrueSsh) { true -> "-vvv" else -> ""}
     }
 }
 
