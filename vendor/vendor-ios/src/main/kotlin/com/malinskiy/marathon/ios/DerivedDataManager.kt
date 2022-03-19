@@ -117,7 +117,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 "-i ${iosConfiguration.remotePrivateKey} " +
                 "-l ${iosConfiguration.remoteUsername} " +
                 "-p ${port.toString()} " +
-                when (true && iostrueSsh) { true -> "-vvv" else -> ""}
+                when (true && iosConfiguration.debugSsh) { true -> "-vvv" else -> ""}
     }
 }
 
