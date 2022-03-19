@@ -1,6 +1,9 @@
 package com.malinskiy.marathon.ios
 
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput
+import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
+import com.github.fracpete.processoutput4j.core.StreamingProcessOwner;
+import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
 import com.github.fracpete.rsync4j.RSync
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.log.MarathonLogging
@@ -14,14 +17,13 @@ import kotlin.concurrent.withLock
 
 private const val PRODUCTS_PATH = "Build/Products"
 
-public static class Output implements StreamingProcessOwner {
+class Output(val logger: KLogger): StreamingProcessOwner {
 
-  private val logger = MarathonLogging.logger(javaClass.simpleName)
-
-  public StreamingProcessOutputType getOutputType() {
+  fun getOutputType(): StreamingProcessOutputType {
     return StreamingProcessOutputType.BOTH;
   }
-  public void processOutput(String line, boolean stdout) {
+
+  fun processOutput(String line, boolean stdout) {
     logger.trace((stdout ? "[OUT] " : "[ERR] ") + line);
   }
 }
@@ -82,7 +84,7 @@ class DerivedDataManager(val configuration: Configuration) {
 
         //val output = CollectingProcessOutput()
         //output.monitor(rsync.builder())
-        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+        StreamingProcessOutput output = StreamingProcessOutput(Output(logger));
         output.monitor(rsync.builder());
         if (output.exitCode != 0) {
             if (output.stdErr.isNotEmpty()) {
