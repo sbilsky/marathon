@@ -14,6 +14,18 @@ import kotlin.concurrent.withLock
 
 private const val PRODUCTS_PATH = "Build/Products"
 
+public static class Output implements StreamingProcessOwner {
+
+  private val logger = MarathonLogging.logger(javaClass.simpleName)
+
+  public StreamingProcessOutputType getOutputType() {
+    return StreamingProcessOutputType.BOTH;
+  }
+  public void processOutput(String line, boolean stdout) {
+    logger.trace((stdout ? "[OUT] " : "[ERR] ") + line);
+  }
+}
+
 class DerivedDataManager(val configuration: Configuration) {
     companion object {
         private val hostnameLocksMap = ConcurrentHashMap<String, Lock>()
@@ -68,8 +80,10 @@ class DerivedDataManager(val configuration: Configuration) {
                 .source(source)
                 .destination(destination)
 
-        val output = CollectingProcessOutput()
-        output.monitor(rsync.builder())
+        //val output = CollectingProcessOutput()
+        //output.monitor(rsync.builder())
+        StreamingProcessOutput output = new StreamingProcessOutput(new Output());
+        output.monitor(rsync.builder());
         if (output.exitCode != 0) {
             if (output.stdErr.isNotEmpty()) {
                 logger.error(output.stdErr)
@@ -110,6 +124,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 .delayUpdates(true)
                 .rsyncPath(iosConfiguration.remoteRsyncPath)
                 .verbose(true)
+                .progress(true)
     }
 
     private fun getSshString(port: Int): String {
@@ -136,7 +151,6 @@ private fun RSync.a(): RSync {
             .owner(true)
             .devices(true)
             .specials(true)
-            .progress(true)
 }
 
 private fun File.isDescendantOf(dir: File): Boolean {
