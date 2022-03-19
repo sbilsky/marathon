@@ -18,13 +18,14 @@ import kotlin.concurrent.withLock
 private const val PRODUCTS_PATH = "Build/Products"
 
 class Output(val logger: KLogger): StreamingProcessOwner {
+  companion object {
+    fun getOutputType(): StreamingProcessOutputType {
+        return StreamingProcessOutputType.BOTH
+    }
 
-  fun getOutputType(): StreamingProcessOutputType {
-    return StreamingProcessOutputType.BOTH;
-  }
-
-  fun processOutput(line: String, stdout: Boolean) {
-    logger.trace((stdout ? "[OUT] " : "[ERR] ") + line);
+    fun processOutput(line: String, stdout: Boolean) {
+        logger.trace((stdout ? "[OUT] " : "[ERR] ") + line)
+    }
   }
 }
 
