@@ -1,13 +1,14 @@
 package com.malinskiy.marathon.ios
 
+import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType
+import com.github.fracpete.processoutput4j.core.StreamingProcessOwner
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput
-import com.github.fracpete.processoutput4j.core.StreamingProcessOutputType;
-import com.github.fracpete.processoutput4j.core.StreamingProcessOwner;
-import com.github.fracpete.processoutput4j.output.StreamingProcessOutput;
+import com.github.fracpete.processoutput4j.output.StreamingProcessOutput
 import com.github.fracpete.rsync4j.RSync
 import com.malinskiy.marathon.execution.Configuration
 import com.malinskiy.marathon.log.MarathonLogging
 import com.malinskiy.marathon.report.html.relativePathTo
+import mu.KLogger
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.concurrent.ConcurrentHashMap
@@ -18,15 +19,13 @@ import kotlin.concurrent.withLock
 private const val PRODUCTS_PATH = "Build/Products"
 
 class Output(val logger: KLogger): StreamingProcessOwner {
-  companion object {
-    fun getOutputType(): StreamingProcessOutputType {
+    override fun getOutputType(): StreamingProcessOutputType {
         return StreamingProcessOutputType.BOTH
     }
 
-    fun processOutput(line: String, stdout: Boolean) {
-        logger.trace((stdout ? "[OUT] " : "[ERR] ") + line)
+    override fun processOutput(line: String, stdout: Boolean) {
+        logger.debug((if (stdout) "[OUT] " else "[ERR] ") + line)
     }
-  }
 }
 
 class DerivedDataManager(val configuration: Configuration) {
@@ -83,15 +82,15 @@ class DerivedDataManager(val configuration: Configuration) {
                 .source(source)
                 .destination(destination)
 
-        //val output = CollectingProcessOutput()
-        //output.monitor(rsync.builder())
-        StreamingProcessOutput output = StreamingProcessOutput(Output(logger));
-        output.monitor(rsync.builder());
-        if (output.exitCode != 0) {
-            if (output.stdErr.isNotEmpty()) {
-                logger.error(output.stdErr)
-            }
-        }
+//        val output = CollectingProcessOutput()
+//        output.monitor(rsync.builder())
+//        if (output.exitCode != 0) {
+//            if (output.stdErr.isNotEmpty()) {
+//                logger.error(output.stdErr)
+//            }
+//        }
+        val output = StreamingProcessOutput(Output(logger))
+        output.monitor(rsync.builder())
     }
 
     fun receive(remotePath: String, hostName: String, port: Int, localPath: File): Int {
