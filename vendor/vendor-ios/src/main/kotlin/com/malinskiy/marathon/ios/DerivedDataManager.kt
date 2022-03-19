@@ -23,7 +23,7 @@ class Output(val logger: KLogger): StreamingProcessOwner {
     return StreamingProcessOutputType.BOTH;
   }
 
-  fun processOutput(String line, boolean stdout) {
+  fun processOutput(line: String, stdout: Boolean) {
     logger.trace((stdout ? "[OUT] " : "[ERR] ") + line);
   }
 }
