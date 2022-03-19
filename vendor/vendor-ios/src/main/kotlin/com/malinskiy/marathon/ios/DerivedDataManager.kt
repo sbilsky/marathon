@@ -18,13 +18,13 @@ import kotlin.concurrent.withLock
 
 private const val PRODUCTS_PATH = "Build/Products"
 
-class Output(val logger: KLogger): StreamingProcessOwner {
+class Output(val logger: KLogger, private val hostName: String, private val port: Int): StreamingProcessOwner {
     override fun getOutputType(): StreamingProcessOutputType {
         return StreamingProcessOutputType.BOTH
     }
 
     override fun processOutput(line: String, stdout: Boolean) {
-        logger.debug((if (stdout) "[OUT] " else "[ERR] ") + line)
+        logger.debug((if (stdout) "[OUT" else "[ERR") + "-${hostName}:${port}] " + line)
     }
 }
 
@@ -33,7 +33,7 @@ class DerivedDataManager(val configuration: Configuration) {
         private val hostnameLocksMap = ConcurrentHashMap<String, Lock>()
     }
 
-    private val logger = MarathonLogging.logger(javaClass.simpleName)
+    private val logger = MarathonLogging.logger(DerivedDataManager::class.java.simpleName)
 
     private val iosConfiguration: IOSConfiguration = configuration.vendorConfiguration as IOSConfiguration
 
@@ -89,8 +89,8 @@ class DerivedDataManager(val configuration: Configuration) {
 //                logger.error(output.stdErr)
 //            }
 //        }
-        logger.debug("[TEST] Starting rsync process..")
-        val output = StreamingProcessOutput(Output(logger))
+        logger.debug("[TEST] Starting rsync process...")
+        val output = StreamingProcessOutput(Output(logger, hostName, port))
         output.monitor(rsync.builder())
     }
 
