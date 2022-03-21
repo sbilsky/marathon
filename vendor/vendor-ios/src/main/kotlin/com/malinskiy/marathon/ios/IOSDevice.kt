@@ -311,7 +311,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                 }
                 disableHardwareKeyboard()
             }
-            logger.info("[RSYNC] Device ${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port} took $totalExecTime ms to rsync")
+            logger.debug("[RSYNC] Device ${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port} took $totalExecTime ms to rsync")
         }
     }
 
