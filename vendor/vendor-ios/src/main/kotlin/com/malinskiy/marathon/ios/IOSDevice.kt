@@ -253,8 +253,8 @@ class IOSDevice(val simulator: RemoteSimulator,
     override suspend fun prepare(configuration: Configuration) = withContext(coroutineContext + CoroutineName("prepare")) {
         val iosConfiguration = configuration.vendorConfiguration as IOSConfiguration
 
-        val totalExecTime = measureTimeMillis {
-            InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
+        InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
+            val totalExecTime = measureTimeMillis {
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Creating remote dir")
                 RemoteFileManager.createRemoteDirectory(this@IOSDevice)
 
@@ -311,8 +311,8 @@ class IOSDevice(val simulator: RemoteSimulator,
                 }
                 disableHardwareKeyboard()
             }
+            logger.info("[RSYNC] Device ${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port} took $totalExecTime ms to rsync")
         }
-        logger.debug("[RSYNC] Total rsync exec time: $totalExecTime")
     }
 
     private fun terminateRunningSimulators() {
