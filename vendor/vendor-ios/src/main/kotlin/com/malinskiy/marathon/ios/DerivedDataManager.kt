@@ -18,13 +18,17 @@ import kotlin.concurrent.withLock
 
 private const val PRODUCTS_PATH = "Build/Products"
 
-class Output(val logger: KLogger, private val hostName: String, private val port: Int): StreamingProcessOwner {
+private class Output(val logger: KLogger, private val hostName: String, private val port: Int): StreamingProcessOwner {
     override fun getOutputType(): StreamingProcessOutputType {
         return StreamingProcessOutputType.BOTH
     }
 
     override fun processOutput(line: String, stdout: Boolean) {
-        logger.debug((if (stdout) "[OUT" else "[ERR") + "-${hostName}:${port}] " + line)
+        if (stdout) {
+            logger.debug("[${hostName}:${port}] " + line)
+        } else {
+            logger.error("[${hostName}:${port}] " + line)
+        }
     }
 }
 
@@ -44,7 +48,7 @@ class DerivedDataManager(val configuration: Configuration) {
         get() = iosConfiguration.xctestrunPath
 
     init {
-        if (true) {
+        if (configuration.debug) {
             logger.trace(rsyncVersion)
         }
         if (!iosConfiguration.remotePrivateKey.exists()) {
@@ -126,8 +130,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 .partialDir(".rsync-partial")
                 .delayUpdates(true)
                 .rsyncPath(iosConfiguration.remoteRsyncPath)
-                .verbose(true)
-                .progress(false)
+                .verbose(configuration.debug)
     }
 
     private fun getSshString(port: Int): String {
@@ -135,7 +138,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 "-i ${iosConfiguration.remotePrivateKey} " +
                 "-l ${iosConfiguration.remoteUsername} " +
                 "-p ${port.toString()} " +
-                when (true && iosConfiguration.debugSsh) { true -> "-vvv" else -> ""}
+                when (configuration.debug && iosConfiguration.debugSsh) { true -> "-vvv" else -> ""}
     }
 }
 
