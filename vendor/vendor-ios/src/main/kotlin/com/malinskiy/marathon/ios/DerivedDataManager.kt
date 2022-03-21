@@ -93,7 +93,7 @@ class DerivedDataManager(val configuration: Configuration) {
 //                logger.error(output.stdErr)
 //            }
 //        }
-        logger.debug("[TEST] Starting rsync process...")
+//        logger.debug("[TEST] Starting rsync process...")
         val output = StreamingProcessOutput(Output(logger, hostName, port))
         output.monitor(rsync.builder())
     }

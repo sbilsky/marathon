@@ -43,6 +43,7 @@ import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.CoroutineContext
+import kotlin.system.measureTimeMillis
 
 class IOSDevice(val simulator: RemoteSimulator,
                 connectionAttempt: Int,
@@ -252,63 +253,66 @@ class IOSDevice(val simulator: RemoteSimulator,
     override suspend fun prepare(configuration: Configuration) = withContext(coroutineContext + CoroutineName("prepare")) {
         val iosConfiguration = configuration.vendorConfiguration as IOSConfiguration
 
-        InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
-            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Creating remote dir")
-            RemoteFileManager.createRemoteDirectory(this@IOSDevice)
+        val totalExecTime = measureTimeMillis {
+            InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Creating remote dir")
+                RemoteFileManager.createRemoteDirectory(this@IOSDevice)
 
-            val derivedDataManager = DerivedDataManager(configuration)
+                val derivedDataManager = DerivedDataManager(configuration)
 
-            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Preparing xctestrun file")
-            val remoteXctestrunFile = RemoteFileManager.remoteXctestrunFile(this@IOSDevice)
-            val xctestrunFile = try {
-                prepareXctestrunFile(derivedDataManager, remoteXctestrunFile)
-            } catch (e: IOException) {
-                logger.warn("Exception getting remote TCP port $e")
-                throw e
-            }
-
-            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile")
-            derivedDataManager.sendSynchronized(
-                    localPath = xctestrunFile,
-                    remotePath = remoteXctestrunFile.absolutePath,
-                    hostName = hostCommandExecutor.hostAddress.hostName,
-                    port = hostCommandExecutor.port
-            )
-
-            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
-            derivedDataManager.sendSynchronized(
-                    localPath = derivedDataManager.productsDir,
-                    remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
-                    hostName = hostCommandExecutor.hostAddress.hostName,
-                    port = hostCommandExecutor.port
-            )
-
-            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] ==== rsync finished ====")
-            this@IOSDevice.derivedDataManager = derivedDataManager
-
-            if (iosConfiguration.simulatorAction == IOSConfiguration.SimulatorAction.ERASE_ONCE) {
-                terminateRunningSimulators()
-                try {
-                    hostCommandExecutor.exec(
-                            "xcrun simctl shutdown $udid",
-                            configuration.testBatchTimeoutMillis,
-                            configuration.testOutputTimeoutMillis
-                    )
-                } catch (e: Exception) {
-                    logger.warn("Exception shutting down remote simulator $e")
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Preparing xctestrun file")
+                val remoteXctestrunFile = RemoteFileManager.remoteXctestrunFile(this@IOSDevice)
+                val xctestrunFile = try {
+                    prepareXctestrunFile(derivedDataManager, remoteXctestrunFile)
+                } catch (e: IOException) {
+                    logger.warn("Exception getting remote TCP port $e")
+                    throw e
                 }
-                try {
-                    hostCommandExecutor.exec(
-                            "xcrun simctl erase $udid",
-                            configuration.testBatchTimeoutMillis,
-                            configuration.testOutputTimeoutMillis
-                    )
-                } catch (e: Exception) {
-                    logger.warn("Exception erasing remote simulator $e")
+
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile")
+                derivedDataManager.sendSynchronized(
+                        localPath = xctestrunFile,
+                        remotePath = remoteXctestrunFile.absolutePath,
+                        hostName = hostCommandExecutor.hostAddress.hostName,
+                        port = hostCommandExecutor.port
+                )
+
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
+                derivedDataManager.sendSynchronized(
+                        localPath = derivedDataManager.productsDir,
+                        remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
+                        hostName = hostCommandExecutor.hostAddress.hostName,
+                        port = hostCommandExecutor.port
+                )
+
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] ==== rsync finished ====")
+                this@IOSDevice.derivedDataManager = derivedDataManager
+
+                if (iosConfiguration.simulatorAction == IOSConfiguration.SimulatorAction.ERASE_ONCE) {
+                    terminateRunningSimulators()
+                    try {
+                        hostCommandExecutor.exec(
+                                "xcrun simctl shutdown $udid",
+                                configuration.testBatchTimeoutMillis,
+                                configuration.testOutputTimeoutMillis
+                        )
+                    } catch (e: Exception) {
+                        logger.warn("Exception shutting down remote simulator $e")
+                    }
+                    try {
+                        hostCommandExecutor.exec(
+                                "xcrun simctl erase $udid",
+                                configuration.testBatchTimeoutMillis,
+                                configuration.testOutputTimeoutMillis
+                        )
+                    } catch (e: Exception) {
+                        logger.warn("Exception erasing remote simulator $e")
+                    }
                 }
+                disableHardwareKeyboard()
             }
-            disableHardwareKeyboard()
         }
+        logger.debug("[RSYNC] Total rsync exec time: $totalExecTime")
     }
 
     private fun terminateRunningSimulators() {
