@@ -253,10 +253,12 @@ class IOSDevice(val simulator: RemoteSimulator,
         val iosConfiguration = configuration.vendorConfiguration as IOSConfiguration
 
         InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
+            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Creating remote dir")
             RemoteFileManager.createRemoteDirectory(this@IOSDevice)
 
             val derivedDataManager = DerivedDataManager(configuration)
 
+            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Preparing xctestrun file")
             val remoteXctestrunFile = RemoteFileManager.remoteXctestrunFile(this@IOSDevice)
             val xctestrunFile = try {
                 prepareXctestrunFile(derivedDataManager, remoteXctestrunFile)
@@ -265,6 +267,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                 throw e
             }
 
+            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile")
             derivedDataManager.sendSynchronized(
                     localPath = xctestrunFile,
                     remotePath = remoteXctestrunFile.absolutePath,
@@ -272,6 +275,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                     port = hostCommandExecutor.port
             )
 
+            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
             derivedDataManager.sendSynchronized(
                     localPath = derivedDataManager.productsDir,
                     remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
@@ -279,6 +283,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                     port = hostCommandExecutor.port
             )
 
+            logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] ==== rsync finished ====")
             this@IOSDevice.derivedDataManager = derivedDataManager
 
             if (iosConfiguration.simulatorAction == IOSConfiguration.SimulatorAction.ERASE_ONCE) {
