@@ -127,7 +127,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 .delayUpdates(true)
                 .rsyncPath(iosConfiguration.remoteRsyncPath)
                 .verbose(true)
-                .progress(true)
+                .progress(false)
     }
 
     private fun getSshString(port: Int): String {
