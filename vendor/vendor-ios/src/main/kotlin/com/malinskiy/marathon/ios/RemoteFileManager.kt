@@ -22,8 +22,14 @@ object RemoteFileManager {
 
     fun removeRemoteDirectory(device: IOSDevice) {
         executeCommand(device,
-                """rm -rf "${remoteDirectory(device)}"""",
+                """rm -Rf "${remoteDirectory(device)}"""",
                 "Unable to remove directory ${remoteDirectory(device)}")
+    }
+
+    fun unzipRemoteArchive(device: IOSDevice) {
+        executeCommand(device,
+                """unzip -q "${remoteDirectory(device)}"/products.zip -d "${remoteDirectory(device)}"""",
+                "Could not unzip remote archive ${remoteDirectory(device)}/products.zip")
     }
 
     fun remoteXctestrunFile(device: IOSDevice): File = remoteFile(device, File(xctestrunFileName(device)))

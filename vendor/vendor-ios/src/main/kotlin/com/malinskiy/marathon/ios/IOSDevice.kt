@@ -256,6 +256,7 @@ class IOSDevice(val simulator: RemoteSimulator,
         InMemoryDeviceTracker.trackDevicePreparing(this@IOSDevice) {
             val totalExecTime = measureTimeMillis {
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] Creating remote dir")
+                RemoteFileManager.removeRemoteDirectory(this@IOSDevice)
                 RemoteFileManager.createRemoteDirectory(this@IOSDevice)
 
                 val derivedDataManager = DerivedDataManager(configuration)
@@ -269,22 +270,23 @@ class IOSDevice(val simulator: RemoteSimulator,
                     throw e
                 }
 
-//                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile to ${remoteXctestrunFile.absolutePath}")
-//                derivedDataManager.sendSynchronized(
-//                        localPath = xctestrunFile,
-//                        remotePath = remoteXctestrunFile.absolutePath,
-//                        hostName = hostCommandExecutor.hostAddress.hostName,
-//                        port = hostCommandExecutor.port
-//                )
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile to ${remoteXctestrunFile.absolutePath}")
+                derivedDataManager.sendSynchronized(
+                        localPath = xctestrunFile,
+                        remotePath = remoteXctestrunFile.absolutePath,
+                        hostName = hostCommandExecutor.hostAddress.hostName,
+                        port = hostCommandExecutor.port
+                )
 
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
-
                 derivedDataManager.sendSynchronized(
-                        localPath = derivedDataManager.productsDir,
+                        localPath = derivedDataManager.productsZip,
                         remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
                         hostName = hostCommandExecutor.hostAddress.hostName,
                         port = hostCommandExecutor.port
                 )
+
+                RemoteFileManager.unzipRemoteArchive(this@IOSDevice)
 
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] ==== rsync finished ====")
                 this@IOSDevice.derivedDataManager = derivedDataManager
