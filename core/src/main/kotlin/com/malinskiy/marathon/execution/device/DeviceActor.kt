@@ -175,6 +175,7 @@ class DeviceActor(private val devicePoolId: DevicePoolId,
                     }
                 }
             } catch (e: Exception) {
+                logger.debug("[TEST] ERROR: e.message")
                 state.transition(DeviceEvent.Terminate)
             }
         }
