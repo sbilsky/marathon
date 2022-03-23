@@ -42,8 +42,8 @@ class DerivedDataManager(val configuration: Configuration) {
 
     private val iosConfiguration: IOSConfiguration = configuration.vendorConfiguration as IOSConfiguration
 
-//    val productsDir: File
-//        get() = iosConfiguration.derivedDataDir.resolve(PRODUCTS_PATH)
+    val productsDir: File
+        get() = iosConfiguration.derivedDataDir.resolve(PRODUCTS_PATH)
 
     val productsZip: File
         get() = iosConfiguration.derivedDataDir.resolve(PRODUCTS_ZIP_PATH)
@@ -58,9 +58,9 @@ class DerivedDataManager(val configuration: Configuration) {
         if (!iosConfiguration.remotePrivateKey.exists()) {
             throw FileNotFoundException("Private key not found at ${iosConfiguration.remotePrivateKey}")
         }
-//        if (xctestrunFile.relativePathTo(productsDir) != xctestrunFile.name) {
-//            throw FileNotFoundException("xctestrun file must be located in build products directory.")
-//        }
+        if (xctestrunFile.relativePathTo(productsDir) != xctestrunFile.name) {
+            throw FileNotFoundException("xctestrun file must be located in build products directory.")
+        }
     }
 
     private val rsyncVersion: String
