@@ -286,7 +286,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                         port = hostCommandExecutor.port
                 )
 
-                RemoteFileManager.unzipRemoteArchive(this@IOSDevice)
+//                RemoteFileManager.unzipRemoteArchive(this@IOSDevice)
 //                val totalUnzipTime = measureTimeMillis {
 //                }
 //                logger.debug("[RSYNC] Device ${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port} took $totalUnzipTime to unzip products")
