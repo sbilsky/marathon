@@ -269,7 +269,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                     throw e
                 }
 
-                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile")
+                logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync xctestrunfile to ${remoteXctestrunFile.absolutePath}")
                 derivedDataManager.sendSynchronized(
                         localPath = xctestrunFile,
                         remotePath = remoteXctestrunFile.absolutePath,
@@ -278,6 +278,7 @@ class IOSDevice(val simulator: RemoteSimulator,
                 )
 
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
+
                 derivedDataManager.sendSynchronized(
                         localPath = derivedDataManager.productsDir,
                         remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
