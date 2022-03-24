@@ -11,10 +11,8 @@ object RemoteFileManager {
     private val logger = MarathonLogging.logger(javaClass.simpleName)
 
     private const val OUTPUT_DIR = "/tmp/marathon"
-    private const val TEMP_DIR="/tmp"
 
     fun remoteDirectory(device: IOSDevice): File = File(OUTPUT_DIR)
-    fun remoteTempDirectory(device: IOSDevice): File = File(TEMP_DIR)
 
     fun createRemoteDirectory(device: IOSDevice) {
         executeCommand(device,
@@ -28,10 +26,10 @@ object RemoteFileManager {
                 "Unable to remove directory ${remoteDirectory(device)}")
     }
 
-    fun unzipRemoteTempArchive(device: IOSDevice, archiveName: String) {
+    fun unzipRemoteArchive(device: IOSDevice, archiveName: String) {
         executeCommand(device,
-                """unzip -q "${remoteTempDirectory(device)}"/$archiveName -d "${remoteDirectory(device)}"""",
-                "Could not unzip remote archive ${remoteTempDirectory(device)}/$archiveName")
+                """unzip -q "${remoteDirectory(device)}"/$archiveName -d "${remoteDirectory(device)}"""",
+                "Could not unzip remote archive ${remoteDirectory(device)}/$archiveName")
     }
 
     fun remoteXctestrunFile(device: IOSDevice): File = remoteFile(device, File(xctestrunFileName(device)))
