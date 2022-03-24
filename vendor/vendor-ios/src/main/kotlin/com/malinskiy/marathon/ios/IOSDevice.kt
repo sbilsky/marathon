@@ -281,13 +281,13 @@ class IOSDevice(val simulator: RemoteSimulator,
                 logger.debug("[TEST-${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port}] rsync products")
                 derivedDataManager.sendSynchronized(
                         localPath = derivedDataManager.productsZip,
-                        remotePath = RemoteFileManager.remoteDirectory(this@IOSDevice).path,
+                        remotePath = RemoteFileManager.remoteTempDirectory(this@IOSDevice).path,
                         hostName = hostCommandExecutor.hostAddress.hostName,
                         port = hostCommandExecutor.port
                 )
 
                 val totalUnzipTime = measureTimeMillis {
-                    RemoteFileManager.unzipRemoteArchive(this@IOSDevice)
+                    RemoteFileManager.unzipRemoteTempArchive(this@IOSDevice, derivedDataManager.productsZip.name)
                 }
                 logger.debug("[RSYNC] Device ${hostCommandExecutor.hostAddress.hostName}:${hostCommandExecutor.port} took $totalUnzipTime to unzip products")
 
