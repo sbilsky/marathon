@@ -43,7 +43,6 @@ import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.CoroutineContext
-import kotlin.system.measureTimeMillis
 
 class IOSDevice(val simulator: RemoteSimulator,
                 connectionAttempt: Int,
