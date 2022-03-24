@@ -90,16 +90,15 @@ class DerivedDataManager(val configuration: Configuration) {
                 .source(source)
                 .destination(destination)
 
-//        val output = CollectingProcessOutput()
-//        output.monitor(rsync.builder())
-//        if (output.exitCode != 0) {
-//            if (output.stdErr.isNotEmpty()) {
-//                logger.error(output.stdErr)
-//            }
-//        }
-//        logger.debug("[TEST] Starting rsync process...")
-        val output = StreamingProcessOutput(Output(logger, hostName, port))
+        val output = CollectingProcessOutput()
         output.monitor(rsync.builder())
+        if (output.exitCode != 0) {
+            if (output.stdErr.isNotEmpty()) {
+                logger.error(output.stdErr)
+            }
+        }
+//        val output = StreamingProcessOutput(Output(logger, hostName, port))
+//        output.monitor(rsync.builder())
     }
 
     fun receive(remotePath: String, hostName: String, port: Int, localPath: File): Int {
@@ -134,7 +133,7 @@ class DerivedDataManager(val configuration: Configuration) {
                 .partialDir(".rsync-partial")
                 .delayUpdates(true)
                 .rsyncPath(iosConfiguration.remoteRsyncPath)
-                .verbose(false)
+                .verbose(true)
     }
 
     private fun getSshString(port: Int): String {
