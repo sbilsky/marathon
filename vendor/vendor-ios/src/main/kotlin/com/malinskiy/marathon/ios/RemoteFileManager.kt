@@ -29,7 +29,7 @@ object RemoteFileManager {
     fun unzipRemoteArchive(device: IOSDevice, archiveName: String) {
         executeCommand(device,
                 """unzip -q "${remoteDirectory(device)}"/$archiveName -d "${remoteDirectory(device)}"""",
-                "Could not unzip remote archive ${remoteDirectory(device)}/$archiveName")
+                "Could not unzip remote archive ${remoteDirectory(device)}/$archiveName", 75000L)
     }
 
     fun remoteXctestrunFile(device: IOSDevice): File = remoteFile(device, File(xctestrunFileName(device)))
@@ -40,10 +40,10 @@ object RemoteFileManager {
 
     private fun remoteFile(device: IOSDevice, file: File): File = remoteDirectory(device = device).resolve(file)
 
-    private fun executeCommand(device: IOSDevice, command: String, errorMessage: String): String? {
+    private fun executeCommand(device: IOSDevice, command: String, errorMessage: String, testOutputTimeoutMillis: Long = 45000L): String? {
         var output: CommandResult? = null
         try {
-            output = device.hostCommandExecutor.execBlocking(command)
+            output = device.hostCommandExecutor.execBlocking(command, testOutputTimeoutMillis = testOutputTimeoutMillis)
         } catch (e: Exception) {
             logger.error(errorMessage, e)
         }
