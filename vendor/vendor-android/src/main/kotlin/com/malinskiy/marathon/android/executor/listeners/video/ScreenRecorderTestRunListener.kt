@@ -73,7 +73,7 @@ internal class ScreenRecorderTestRunListener(private val fileManager: FileManage
                 recorder?.join(awaitMillis)
             }
             logger.trace { "join ${join}ms" }
-            if (hasFailed) {
+            if (true) {
                 val stop = measureTimeMillis {
                     screenRecorderStopper.stopScreenRecord()
                 }
